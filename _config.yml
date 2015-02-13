@@ -7,7 +7,7 @@ title:            Poole
 tagline:          The Jekyll Butler
 url:              
 paginate:         1
-baseurl:          /
+url:              http://joshbradshaw.github.io/Arterial-BP-MRI-Triggering-Unit/
 author:
   name:           Mark Otto
   url:            https://twitter.com/mdo
