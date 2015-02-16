@@ -20,13 +20,13 @@ To correct for this discrepency, mplification between the Samba instrument and t
 
 The entire design is based off of this simple Analog Devices whitepaper: [CN0112: Variable Gain Noninverting Amplifier Using the AD5292 Digital Potentiometer and the OP184 Op Amp](http://www.analog.com/en/circuits-from-the-lab/cn0112/vc.html).
 
-![alt text]({{ BASE_PATH }}/images/linear_variable_gain_adjust.jpg)
+![alt text]({{ site.url }}/images/linear_variable_gain_adjust.jpg)
 
 I chose this circuit because it offered an appropriate gain adjustment range, and because [PJRC already worked out how to interface these digital potentiometers with the Teensy 3.1 through SPI](https://www.pjrc.com/teensy/td_libs_SPI.html).
 
 I started by patching up a simple non-inverting amplifier, on a breadboard like so:
 
-<img src="{{ BASE_PATH }}/images/gain_adjust_amplifier.JPG" alt="Slope Sum function applied to blood pressure waveform" style="width: 600px;"/>
+<img src="{{ site.url }}/images/gain_adjust_amplifier.JPG" alt="Slope Sum function applied to blood pressure waveform" style="width: 600px;"/>
 
 This amplifier had an adjustable gain range of 1.1 V/V to 10 V/V with 256 subdivisions. This is more than enough gain to amplify a 70/30 mmHg signal to the full range of the ADC.
 
