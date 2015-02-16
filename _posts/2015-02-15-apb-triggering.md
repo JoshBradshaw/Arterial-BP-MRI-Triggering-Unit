@@ -1,6 +1,8 @@
 ---
 layout: post
 title: Blood Pressure Triggering Algorithm
+tagline: "not supporting tagline"
+tags : [MRI, Algorithm, Triggering]
 ---
 
 This post describes the algorithm used to detect the peaks of the arterial blood pressure pulses for triggering. 
@@ -31,7 +33,7 @@ The slope sum function is:
 
 Here's an example blood pressure recording (in blue) and the corresponding slope sum function output (in red):
 
-![alt text]({{ site.url }}/images/ssf_demo.png "the slope sum function applied to a human arterial blood pressure waveform")
+<img src="{{ site.url }}/images/ssf_demo.png" alt="Slope Sum funciton applied to blood pressure waveform" style="width: 600px;"/>
 
 This simple function is extrememly useful for two reasons:
 
@@ -50,17 +52,17 @@ A variety of peak detection algorithms were tested for this purpose. The best pe
 
 The state machine works by advancing two moving averages as samples are collected. Each average is based on three samples, and they are spaced 3 samples apart (for a sampling rate of 250 Hz, this makes a gives a total delay of 9 x 4ms = 36ms). 
 
-### RISING STATE
+#### RISING STATE
 
 When the state-machine is in rising state, it is constantly checking whether the right moving average has become greater than the left moving average. This is funcitonally equivalant to taking the backwards approximation of the derivative, but using averages instead of single points helps to ensure that little blips in the data won't be mistaken for the true peaks.
 
-### PEAK DETECTED
+#### PEAK DETECTED
 
 The state-machine sends a 3.3V TTL signal the to MRI scanner. For Siemens scanners the TTL signal is required to meet these criteria:
 
 ![alt text]({{ site.url }}/images/siemens_external_trigger.png "the slope sum function applied to a human arterial blood pressure waveform")
 
-### REFRACTORY PERIOD
+#### REFRACTORY PERIOD
 
 The algorithm stays in the refractory state until all of the following conditions have been met:
 
