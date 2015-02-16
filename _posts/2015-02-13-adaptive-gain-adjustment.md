@@ -1,19 +1,32 @@
 ---
 layout: post
-title: Building a Preamplifier with Adaptive Gain Adjustment
+title: Building a Preamplifier with Adaptive Gain Adjustment for Fetal Blood Pressure Measurement
+tagline: "not supporting tagline"
+tags : [Amplifier, Linear Gain Adjustment]
 ---
 
 A major problem with triggering off of the fetal blood pressures is that the signal coming from the transducers is relatively small compared to the full scale of the pressure measurement instrument. 
 
-The samba sensors instrument and fibre optic pressure transducer that I currently have at hand has a full scale pressure range of -38 mmHg to 263 mmHg, which is linearly mapped to a 0 - 5V analog output. The full scale blood pressure range of fetal lambs was measured by our colleagues in Australia to be a 70/30 mmHg. I have not yet found blood pressure numbers for fetal Yorkshire pigs, but I assume that they should be close enough that 70/30 mmHg is a workable estimate.
+## Specifications
 
-This large difference between the full scale range of the instrument is problematic, because it means that only 0.66V of the 5V range will be used for the signal $\frac{70-30}{263 - (-38} * 5V = 0.66V$
+* The Samba Sensor can measure pressures from -38 mmHg to 263 mmHg, which is linearly mapped to a 0-5V output
+* Fetal lambs have a typical blood pressure of 70/30 mmHg, which is the best approximation we have for a fetal Yorkshire pig
 
-To correct for this discrepency, we need to insert an amplifier between the Samba instrument and the analog to digital converter. I choose to go with a digitally adjustable gain amplifier for this problem, because I wanted the microcontroller to be able to adjust the gain automatically without any manual intervention. 
+With the assumed blood pressure range of the pig, only 0.66V of the 5V range will be used for the signal ((70-30)/(263 - (-38))) * 5V = 0.66V
 
-The circuit I built was based on this whitepaper from Analog Devices: [CN0112: Variable Gain Noninverting Amplifier Using the AD5292 Digital Potentiometer and the OP184 Op Amp](http://www.analog.com/en/circuits-from-the-lab/cn0112/vc.html). I chose this circuit because it offered an appropriate gain adjustment range, and because [PJRC already worked out how to interface these digital potentiometers with the Teensy 3.1 through SPI](https://www.pjrc.com/teensy/td_libs_SPI.html).
+## Building Blocks
 
-I started by patching up a simple non-inverting amplifier, with the following schematic:
+To correct for this discrepency, mplification between the Samba instrument and the analog to digital converter <abbr>ADC</abbr>. I chose to go with a digitally adjustable gain amplifier for this problem, because I wanted the microcontroller to be able to adjust the gain automatically without any manual intervention. 
+
+The entire design is based off of this simple Analog Devices whitepaper: [CN0112: Variable Gain Noninverting Amplifier Using the AD5292 Digital Potentiometer and the OP184 Op Amp](http://www.analog.com/en/circuits-from-the-lab/cn0112/vc.html).
+
+![alt text]({{ site.url }}/images/linear_variable_gain_adjust.jpg)
+
+I chose this circuit because it offered an appropriate gain adjustment range, and because [PJRC already worked out how to interface these digital potentiometers with the Teensy 3.1 through SPI](https://www.pjrc.com/teensy/td_libs_SPI.html).
+
+I started by patching up a simple non-inverting amplifier, on a breadboard like so:
+
+<img src="{{ site.url }}/images/gain_adjust_amplifier.JPG" alt="Slope Sum function applied to blood pressure waveform" style="width: 600px;"/>
 
 This amplifier had an adjustable gain range of 1.1 V/V to 10 V/V with 256 subdivisions. This is more than enough gain to amplify a 70/30 mmHg signal to the full range of the ADC.
 
