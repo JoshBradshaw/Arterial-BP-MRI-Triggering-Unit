@@ -20,12 +20,9 @@ The algorithm is based upon the following requirements and so forth:
 ## Filtering
 
 Below is an image of an idealized arterial blood pressure pulse:
-{{BASE_PATH}}
-{{BASE_PATH}}
-{{BASE_PATH}}
 
 
-![alt text]({{BASE_PATH}}/images/ideal_arterial_blood_pressure_pulse.gif "An arterial blood pressure pulse")
+![alt text]({{site.url}}/images/ideal_arterial_blood_pressure_pulse.gif "An arterial blood pressure pulse")
 
 As you can see, there's a large pulse followed by a small reflection pulse just after the dichrontic notch. For the purposes of MRI triggering, the second pulse is not useful information. 
 

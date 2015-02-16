@@ -10,6 +10,8 @@ highlighter: pygments
 #
 title : Arterial BP MRI Triggering Unit
 tagline: Site Tagline
+url: http://joshbradshaw.github.io/Arterial-BP-MRI-Triggering-Unit/
+
 author :
   name : Josh Bradshaw
   email : joshbradshaw11@gmail.com
@@ -53,7 +55,7 @@ JB :
   #   - Only the following values are falsy: ["", null, false]
   #   - When setting BASE_PATH it must be a valid url.
   #     This means always setting the protocol (http|https) or prefixing with "/"
-  BASE_PATH : http://joshbradshaw.github.io/Arterial-BP-MRI-Triggering-Unit/
+  BASE_PATH : ""
 
   # By default, the asset_path is automatically defined relative to BASE_PATH plus the enabled theme.
   # ex: [BASE_PATH]/assets/themes/[THEME-NAME]
