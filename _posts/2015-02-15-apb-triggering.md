@@ -7,7 +7,7 @@ tags : [MRI, Algorithm, Triggering]
 
 This post describes the algorithm used to detect the peaks of the arterial blood pressure pulses for triggering. 
 
-The algorithm is based upon the following requirements:
+The algorithm is based upon the following requirements and so forth:
 
 1. Must detect the pressure peaks using <40ms of delay.
 2. Must be capable of coping with DC drift in the same order of magnitude as the signal itself (past recordings with our instruments large DC drift).
