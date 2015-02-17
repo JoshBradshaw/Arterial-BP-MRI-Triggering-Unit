@@ -9,11 +9,11 @@ The Arterial BP Triggering Unit is designed to convert a blood pressure signal i
 
 Given an arterial blood pressure input, the unit sends a 5V trigger signal immediately after the pressure peak of each heartbeat. This is illustrated below in a simple graphic. The red waveform is an arterial pressure trace aquired through a non-invasive blood pressure cuff, and the fine blue vertical lines represent when the trigger signals were sent.
 
-<img src="{{ site.url }}/images/trigger_example.jpg" alt="Trigger Unit Case" style="width: 550px;"/>
+<img src="{{ site.url }}/images/trigger_example.jpg" alt="Trigger Unit Case" style="width: 300px;"/>
 
 ## Application
 
-This system was designed for use at SickKids hospital in MRI research. In particular, its is designed for trigging a Siemen's Magnetom Trio scanner while taking 4D Flow measurements on fetal Yorkshire pigs.
+This system was designed for the MRI research department at SickKids hospital for prenatal fetal heart imaging experiments. In particular, its is designed for trigging a Siemen's Magnetom Trio scanner while taking 4D Flow measurements on fetal Yorkshire pigs.
 
 More information about the unit and its design is available:
 
