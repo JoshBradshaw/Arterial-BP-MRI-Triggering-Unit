@@ -1,46 +1,24 @@
 ---
 layout: page
-title: Hello World!
-tagline: Supporting tagline
+title: Device Overview
+tagline: 
 ---
 {% include JB/setup %}
 
-Read [Jekyll Quick Start](http://jekyllbootstrap.com/usage/jekyll-quick-start.html)
+The Arterial BP Triggering Unit is designed to convert a blood pressure signal into a TTL signal in real time.
 
-Complete usage and documentation available at: [Jekyll Bootstrap](http://jekyllbootstrap.com)
+Given an arterial blood pressure input, the unit sends a 5V trigger signal immediately after the pressure peak of each heartbeat. This is illustrated below in a simple graphic. The red waveform is an arterial pressure trace aquired through a non-invasive blood pressure cuff, and the fine blue vertical lines represent when the trigger signals were sent.
 
-## Update Author Attributes
+<img src="{{ site.url }}/images/trigger_example.jpg" alt="Trigger Unit Case" style="width: 550px;"/>
 
-In `_config.yml` remember to specify your own data:
-    
-    title : My Blog =)
-    
-    author :
-      name : Name Lastname
-      email : blah@email.test
-      github : username
-      twitter : username
+## Application
 
-The theme should reference these variables whenever needed.
-    
-## Sample Posts
+This system was designed for use at SickKids hospital in MRI research. In particular, its is designed for trigging a Siemen's Magnetom Trio scanner while taking 4D Flow measurements on fetal Yorkshire pigs.
 
-This blog contains sample posts which help stage pages and blog data.
-When you don't need the samples anymore just delete the `_posts/core-samples` folder.
-
-    $ rm -rf _posts/core-samples
-
-Here's a sample "posts list".
+More information about the unit and its design is available:
 
 <ul class="posts">
   {% for post in site.posts %}
     <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ BASE_PATH }}{{ post.url }}">{{ post.title }}</a></li>
   {% endfor %}
 </ul>
-
-## To-Do
-
-This theme is still unfinished. If you'd like to be added as a contributor, [please fork](http://github.com/plusjade/jekyll-bootstrap)!
-We need to clean up the themes, make theme usage guides with theme-specific markup examples.
-
-
