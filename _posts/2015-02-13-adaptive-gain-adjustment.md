@@ -32,19 +32,4 @@ This amplifier had an adjustable gain range of 1.1 V/V to 10 V/V with 256 subdiv
 
 With that all patched up and working, all that remains is to write an efficient algorithm for bringing the signal into full range in real time.
 
-## Algorithm Requirements
-
-1. Must not depend on the triggering algorithm working properly, because in the case of output saturation, or extremely low signal amplitude, this will not work.
-2. Must quickly detect and correct when the signal goes above or below the accepable range.
-3. Must provide a no signal warning when the signals magnitude is too small for correction by gain adjustment.
-
-## Algorithm
-
-* Four seconds of data will be recorded in a ring buffer. If the average voltage is less than 1V or greater than 2V, the gain will be increased or decreased by an amount proportional to the difference.
-
-## Test Cases:
-
-All testing will be done with an arbitrary waveform generator.
-
-1. Signal with 0.3V peak-to-peak magnitude (<abbr>Vpp</abbr>) input to the amplifier. Passing Criteria: the signal must be amplified to 3Vpp with a response time of less than 15 seconds.
-2. After a 0.3Vpp signal has been increased to 
+The algorithm development is documented in this post:
