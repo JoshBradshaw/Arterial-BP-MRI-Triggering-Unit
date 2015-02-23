@@ -7273,6 +7273,15 @@ In this library the device names are the same as the pin names of the symbols, t
 </nets>
 </sheet>
 </sheets>
+<errors>
+<approved hash="104,1,76.2,83.82,TEENSY3.0,VIN,VCC,,,"/>
+<approved hash="204,1,76.2,81.28,TEENSY3.0,3.3V,,,,"/>
+<approved hash="204,1,76.2,88.9,TEENSY3.0,VBAT,,,,"/>
+<approved hash="104,1,33.02,15.24,AD5206-50,VDD,VCC,,,"/>
+<approved hash="104,1,33.02,17.78,AD5206-50,VSS,GND,,,"/>
+<approved hash="104,1,-2.54,109.22,U1,V+,VCC,,,"/>
+<approved hash="104,1,-2.54,81.28,U1,V-,AGND,,,"/>
+</errors>
 </schematic>
 </drawing>
 </eagle>
