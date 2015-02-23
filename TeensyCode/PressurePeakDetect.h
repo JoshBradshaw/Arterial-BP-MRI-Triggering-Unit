@@ -30,11 +30,11 @@ class cicularBuffer {
             // add samples until array full, then begin overwriting oldest
             // samples, advancing the first/last indexes to keep track
             if(validItems==BUFFER_LEN) {
-              buff[last] = newSample;
-              first = (first+1)%BUFFER_LEN;
+                buff[last] = newSample;
+                first = (first+1)%BUFFER_LEN;
             } else {
-              validItems++;
-              buff[last] = newSample;    
+                validItems++;
+                buff[last] = newSample;    
             }
             last = (last+1)%BUFFER_LEN;
         }
