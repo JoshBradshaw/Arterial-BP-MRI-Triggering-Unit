@@ -21,6 +21,9 @@
  
 */
 
+#ifndef __AUTOGAINADJUST__
+#define __AUTOGAINADJUST__
+
 #include "spi4teensy3.h"
 
 // set pin 10 as the slave select for the digital pot:
@@ -131,3 +134,4 @@ void adjustGain(const int sensor_value) {
 }
 
 
+#endif

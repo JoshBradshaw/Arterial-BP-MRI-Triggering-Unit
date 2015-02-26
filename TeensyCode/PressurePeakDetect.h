@@ -1,3 +1,6 @@
+#ifndef __PRESSUREPEAKDETECTH__
+#define __PRESSUREPEAKDETECTH__
+
 const int BUFFER_LEN = 32; // determines how many samples will be stored at a time
 
 class cicularBuffer {
@@ -133,3 +136,5 @@ class peakDetect {
              return(false);
         }       
 }; 
+
+#endif
