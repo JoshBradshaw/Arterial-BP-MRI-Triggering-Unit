@@ -18,7 +18,7 @@ const int ANALOG_INPUT_PIN = 15;
 const int SCANNER_TRIGGER_PIN = 4;
 const int LED_PIN = 12;
 const int PULSE_DURATION = TRIGGER_PULSE_DURATION / SAMPLING_PERIOD;
-const int GAIN_ADJUST_PERIOD = 100; // millisecons
+const int GAIN_ADJUST_PERIOD = 100; // milliseconds
 const int gainAdjustDuration = GAIN_ADJUST_PERIOD / SAMPLING_PERIOD;
 volatile int pulseDurationCount;
 volatile int gainAdjustCount = 0;
@@ -29,7 +29,6 @@ peakDetect pd;
 
 void setup() {
     Serial.begin(115200); // fastest possible BAUD rate
-    //analogReadResolution(12); // The arduino Due has 12 bit ADCs
     pinMode(SCANNER_TRIGGER_PIN, OUTPUT);
     pinMode(LED_PIN, OUTPUT);
     // hardware clock triggers interrupts every x microseconds and calls the given ISR
@@ -44,7 +43,6 @@ void loop() {
 void sample() {
     // signal pathway
     // blood pressure transducer --> Arduino ADC --> low pass filter --> slopesum function --> peak detector
-    Serial.printf("Sample taken \n");
     int sampleVal = analogRead(ANALOG_INPUT_PIN);
     int ssfVal = ssf.step(sampleVal);
     bool sampleIsPeak = pd.isPeak(ssfVal);

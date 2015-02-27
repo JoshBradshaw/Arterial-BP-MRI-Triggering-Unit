@@ -13,8 +13,6 @@ class cicularBuffer {
             }
         }
     private:
-        // volatile so that Arduino won't store these values in registers
-        // which would break the interrupt service routines
         volatile int buff[BUFFER_LEN];
         volatile int validItems = 0;
         volatile int first = 0;
@@ -121,8 +119,8 @@ class peakDetect {
             updateMovingAverages();
             
             if (rising && left_moving_sum > right_moving_sum) {
-                 updatePeakThreshold(left_moving_sum);
-                 rising = false;
+                updatePeakThreshold(left_moving_sum);
+                rising = false;
                 return(true);
              }
              
@@ -133,7 +131,7 @@ class peakDetect {
             } else {
                 rp_counter += 1;
             }
-             return(false);
+            return(false);
         }       
 }; 
 

@@ -29,17 +29,22 @@
 // set pin 10 as the slave select for the digital pot:
 const int slaveSelectPin = 10;
 const int SAMBA_SENSOR_PIN = 14;
+const int SAMBA_GAIN_POT = 2; // corresponds to pins B3 and W3 on the AD5204 or AD5206
+
+// these numbers are based on a 16 bit ADC which has 2^16 = 65536 counts
+const int MIN_SIGNAL_AMPLITUDE = 10000; // ~0.76 V from the noninverting amplifier
+const int TARGET_AMPLITUDE = 35000; // ~2.67 V from the noninverting amplifier
+const int MAX_SIGNAL_AMPLITUDE = 55000; // ~4.20 V from the noninverting amplifier
+// number of potentiomter codes to correct by if signal is out of range
+// a higher number results in a faster correction
+const int CORRECTION = 10; 
+
+volatile int potentiometerValue = 0; // range 0-256 where 0 -> ~84 ohms and 256 -> ~50 k-ohms
+// if gain is being shifted up or down, this gives the stopping value
+volatile int targetPotentiometerValue = 0; 
 
 const int WINDOW_PERIOD = 50; // number of 100ms increments
-const int MIN_SIGNAL_AMPLITUDE = 10000;
-const int TARGET_AMPLITUDE = 35000;
-const int MAX_SIGNAL_AMPLITUDE = 55000;
-const int CORRECTION = 10; // number of potentiomter codes to correct by if signal is out of range
-
-volatile int potentiometerValue = 0; // range 0-256 where 0 -> ~84 Ohm and 256 -> ~50 KOhm
-volatile int targetPotentiometerValue = 0;
-volatile int windowCount = 0;
-const int SAMBA_GAIN_POT = 2; // corresponds to pins B3 and W3 on the AD5204 or AD5206
+volatile int windowCount = 0; // gain is adjusted when windowCount exceeds WINDOW PERIOD
 
 volatile bool minExceeded = false;
 volatile bool maxExceeded = false;
@@ -48,23 +53,24 @@ volatile bool targetExceeded = false;
 // 0 = equilibrium
 // 1 = increasing gain to meet threshold
 // 2 = decreasing gain to meet threshold
+// starts in increasing state to ensure that the signal is amplified to an optimal level at startup
 volatile int seekState = 1;
 
 void digitalPotWrite(const int address, int value) {
-  // write the new potentiometer value to the digital pot chip through SPI
-  // take the SS pin low to select the chip:
-  digitalWrite(slaveSelectPin, LOW);
-  //  send in the address and value via SPI:
-  spi4teensy3::send(address);
-  spi4teensy3::send(potentiometerValue);
-  // take the SS pin high to de-select the chip:
-  digitalWrite(slaveSelectPin, HIGH); 
+    // write the new potentiometer value to the digital pot chip through SPI
+    // take the SS pin low to select the chip:
+    digitalWrite(slaveSelectPin, LOW);
+    //  send in the address and value via SPI:
+    spi4teensy3::send(address);
+    spi4teensy3::send(potentiometerValue);
+    // take the SS pin high to de-select the chip:
+    digitalWrite(slaveSelectPin, HIGH); 
 }
 
 void setupGainAdjustment() {
-  pinMode (slaveSelectPin, OUTPUT);
-  spi4teensy3::init();
-  digitalPotWrite(SAMBA_GAIN_POT, 0); // start with unity gain to avoid clipping
+    pinMode (slaveSelectPin, OUTPUT);
+    spi4teensy3::init();
+    digitalPotWrite(SAMBA_GAIN_POT, 0); // start with unity gain to avoid clipping
 }
 
 // algorithm:
@@ -73,64 +79,68 @@ void setupGainAdjustment() {
 // if the signal doesn't meet these criteria, it will be increased or decreased until its max
 // ampitude passes TARGET_AMPLITUDE, or the amplifier reaches maximum or minimum gain
 void adjustGain(const int sensor_value) {
-  // adjust potentiometer value if required (done in steps of 1 count for smoothness)
-  if (potentiometerValue < targetPotentiometerValue) {
-    potentiometerValue += 1;
-    digitalPotWrite(SAMBA_GAIN_POT, potentiometerValue);
-  }
-  if (potentiometerValue > targetPotentiometerValue) {
-    potentiometerValue -= 1;
-    digitalPotWrite(SAMBA_GAIN_POT, potentiometerValue);
-  }
-  // check if this sample is out of bounds
-  if (sensor_value > MIN_SIGNAL_AMPLITUDE) {
-    minExceeded = true;
-  } 
-  if (sensor_value > MAX_SIGNAL_AMPLITUDE) {
-    maxExceeded = true;
-  }
-  if (sensor_value > TARGET_AMPLITUDE) {
-    targetExceeded = true;
-  }
-  // this section runs every 5 seconds
-  // checks if gain needs to be adjusted, and sets the new gain value if required
-  if (windowCount > WINDOW_PERIOD) {  
-    // check if min or max have been violated
-    if (!minExceeded) {
-      seekState = 1;
+    // adjust potentiometer value if required (done in steps of 1 count for smoothness)
+
+    // increase the pot value by one count
+    if (potentiometerValue < targetPotentiometerValue) {
+        potentiometerValue += 1;
+        digitalPotWrite(SAMBA_GAIN_POT, potentiometerValue);
     }
-    if (maxExceeded) {
-      seekState = 2;
+    // decrease the pot value by one count
+    if (potentiometerValue > targetPotentiometerValue) {
+        potentiometerValue -= 1;
+        digitalPotWrite(SAMBA_GAIN_POT, potentiometerValue);
     }
-    // if unit was increasing gain, check if the threshold magnitude was reached
-    if (seekState == 1) {
-      if (targetExceeded) {
-        seekState = 0;
-      } else if (potentiometerValue <= 256 - CORRECTION) {
-        targetPotentiometerValue += CORRECTION;
-      }
-      else {
-        return;
-      }
+
+    // check if this sample is out of bounds
+    if (sensor_value > MIN_SIGNAL_AMPLITUDE) {
+        minExceeded = true;
+    } 
+    if (sensor_value > MAX_SIGNAL_AMPLITUDE) {
+        maxExceeded = true;
     }
-    // if unit was decreasing gain, check if threshold reached
-    if (seekState == 2) {
-      if (!targetExceeded) {
-        seekState = 0;
-      } else if (potentiometerValue >= 0 + CORRECTION) {
-        targetPotentiometerValue -= CORRECTION;
-      } else {
-        return;
-      }
+    if (sensor_value > TARGET_AMPLITUDE) {
+        targetExceeded = true;
     }
-    
-    // reset state
-    minExceeded = false;
-    targetExceeded = false;
-    maxExceeded = false;
-    windowCount = 0;
-  }
-  windowCount++;
+    // this section runs every 5 seconds
+    // checks if gain needs to be adjusted, and sets the new gain value if required
+    if (windowCount > WINDOW_PERIOD) {  
+        // check if min or max have been violated
+        if (!minExceeded) {
+            seekState = 1;
+        }
+        if (maxExceeded) {
+            seekState = 2;
+        }
+        // if unit was increasing gain, check if the threshold magnitude was reached
+        if (seekState == 1) {
+            if (targetExceeded) {
+                seekState = 0;
+            } else if (potentiometerValue <= 256 - CORRECTION) {
+                targetPotentiometerValue += CORRECTION;
+            }
+            else {
+                return;
+            }
+        }
+        // if unit was decreasing gain, check if threshold reached
+        if (seekState == 2) {
+            if (!targetExceeded) {
+                seekState = 0;
+            } else if (potentiometerValue >= 0 + CORRECTION) {
+                targetPotentiometerValue -= CORRECTION;
+            } else {
+                return;
+            }
+        }
+
+        // reset state
+        minExceeded = false;
+        targetExceeded = false;
+        maxExceeded = false;
+        windowCount = 0;
+    }
+    windowCount++;
 }
 
 
