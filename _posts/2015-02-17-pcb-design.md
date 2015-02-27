@@ -22,7 +22,7 @@ The Teensy eagle CAD library used in this design is available at the [PJRC websi
 
 Design:
 
-![alt text]({{ site.url }}pcb_layout.png "Circuit board layout")
+![alt text]({{ site.url }}/images/pcb_layout.png "Circuit board layout")
 
 Build Photos:
 
