@@ -5,7 +5,7 @@ title: Designing an Algorithm for Adjusting Signal Gain in Real Time
 
 ## Algorithm Requirements
 
-1. Must not depend on the triggering algorithm working properly, because in the case of output saturation, or extremely low signal amplitude, this will not work.
+1. Must not depend on the triggering algorithm working properly, because in the case of output saturation, or extremely low signal amplitude, triggering will not be functional.
 2. Must quickly detect and correct when the signal goes above or below the accepable range.
 3. Must provide a no signal warning when the signals magnitude is too small for correction by gain adjustment.
 
@@ -183,3 +183,8 @@ Once again the Teensy centered the signal on the target threshold as expected.
 --* Change the gain gradually in incrememnts of 1 count.
 I've opted not to tackle this in this version of the algorithm, because the testing the output waveform will require a better oscilliscope than I currently have available.
 3. The case where the gain can not get high enough or low enough to center the signal is not handled very well. Ideally the Teensy should issue a status runtime warning or turn on an LED indicator.
+
+## Related Questions and Uncertainty
+1. What will a fetal pig's blood pressure be in uturo? Current estimate is 70/30 mmHg based on measurements taken by an Australian research group.
+2. If we switch to using a Transonic unit, what is the Transonic units reference pressure? Can it be zeroed? Will the module ever use the negative portion of the -5V to 5V analog output range if we zero the unit at ambient atmospheric pressure?
+3. 
