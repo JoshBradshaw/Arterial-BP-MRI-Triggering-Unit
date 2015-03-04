@@ -42,7 +42,7 @@ class Ui_win_plot(object):
         self.horizontalLayout.addWidget(self.btnD)
         self.verticalLayout.addLayout(self.horizontalLayout)
         win_plot.setCentralWidget(self.centralwidget)
-
+        self.qwtPlot.setAxisScale(0, 0, 65536, 10000)
         self.retranslateUi(win_plot)
         QtCore.QMetaObject.connectSlotsByName(win_plot)
 

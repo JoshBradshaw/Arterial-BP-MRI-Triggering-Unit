@@ -23,8 +23,9 @@ const int gainAdjustDuration = GAIN_ADJUST_PERIOD / SAMPLING_PERIOD;
 volatile int pulseDurationCount;
 volatile int gainAdjustCount = 0;
 volatile bool triggerPulseHigh = false;
-const int SERIAL_UPDATE_PERIOD = 6;
+const int SERIAL_UPDATE_PERIOD = 4;
 int serial_update_count = 0;
+const int TRIGGER_SENT_CODE = 100000;
 
 slopesum ssf;
 peakDetect pd;
@@ -65,6 +66,7 @@ void sample() {
         digitalWrite(LED_PIN, HIGH);
         triggerPulseHigh = true;
         pulseDurationCount = 0;
+        Serial.println(TRIGGER_SENT_CODE); // signal to the monitoring software that trigger sent
     }
 
     if (triggerPulseHigh && pulseDurationCount >= PULSE_DURATION) {
@@ -84,10 +86,10 @@ void sample() {
         gainAdjustCount++;
     }
     
-    if (serial_update_count >= SERIAL_UPDATE_PERIOD) {
+    if (serial_update_count < SERIAL_UPDATE_PERIOD) {
+        serial_update_count++;
+    } else {
         Serial.println(sampleVal);
         serial_update_count = 0;
-    } else {
-        serial_update_count++;
     }
 }
