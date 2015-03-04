@@ -3,14 +3,26 @@ import sys
 import numpy
 from PyQt4 import QtCore, QtGui
 import PyQt4.Qwt5 as Qwt
+import serial
 
-numPoints=1000
+ser = serial.Serial()
+ser.baudrate = 115200
+ser.port = 'COM14'
+ser.timeout = 1
+ser.open()
+
+numPoints=100
 xs=numpy.arange(numPoints)
-ys=numpy.sin(3.14159*xs*10/numPoints)
+ys=numpy.zeros(numPoints)
 
 def plotSomething():
     global ys
-    ys=numpy.roll(ys,-1)
+    ys=numpy.roll(ys, -1)
+    try:
+        ys.flat[99] = int(ser.readline())
+    except ValueError:
+        print "caught valurerror"
+        ys.flat[99] = ys.flat[98]
     #print "PLOTTING"
     c.setData(xs, ys)
     uiplot.qwtPlot.replot()   

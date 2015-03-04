@@ -23,6 +23,8 @@ const int gainAdjustDuration = GAIN_ADJUST_PERIOD / SAMPLING_PERIOD;
 volatile int pulseDurationCount;
 volatile int gainAdjustCount = 0;
 volatile bool triggerPulseHigh = false;
+const int SERIAL_UPDATE_PERIOD = 6;
+int serial_update_count = 0;
 
 slopesum ssf;
 peakDetect pd;
@@ -80,5 +82,12 @@ void sample() {
         gainAdjustCount = 0;
     } else {
         gainAdjustCount++;
+    }
+    
+    if (serial_update_count >= SERIAL_UPDATE_PERIOD) {
+        Serial.println(sampleVal);
+        serial_update_count = 0;
+    } else {
+        serial_update_count++;
     }
 }

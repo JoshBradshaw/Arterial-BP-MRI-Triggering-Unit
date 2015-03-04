@@ -39,7 +39,7 @@ const int MAX_SIGNAL_AMPLITUDE = 55000; // ~4.20 V from the noninverting amplifi
 // a higher number results in a faster correction
 const int CORRECTION = 10; 
 
-volatile int potentiometerValue = 200; // range 0-256 where 0 -> ~84 ohms and 256 -> ~50 k-ohms
+volatile int potentiometerValue = 0; // range 0-256 where 0 -> ~84 ohms and 256 -> ~50 k-ohms
 // if gain is being shifted up or down, this gives the stopping value
 volatile int targetPotentiometerValue = potentiometerValue; 
 
@@ -87,7 +87,6 @@ void setupGainAdjustment() {
 // if the signal doesn't meet these criteria, it will be increased or decreased until its max
 // ampitude passes TARGET_AMPLITUDE, or the amplifier reaches maximum or minimum gain
 void adjustGain(const int sensor_value) {
-    Serial.printf("pot value: %d, target pot value: %d \n", potentiometerValue, targetPotentiometerValue);
     // adjust potentiometer value if required (done in steps of 1 count for smoothness)
 
     // increase the pot value by one count
@@ -142,7 +141,6 @@ void adjustGain(const int sensor_value) {
                 return;
             }
         }
-        Serial.printf("state: %d, minExceeded: %d, targetExceeded: %d, maxExceeded: %d,  pot value: %d \n", seekState, minExceeded, targetExceeded, maxExceeded, potentiometerValue);
         // reset state
         minExceeded = false;
         targetExceeded = false;
