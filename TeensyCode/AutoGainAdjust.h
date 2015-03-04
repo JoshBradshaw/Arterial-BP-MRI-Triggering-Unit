@@ -28,8 +28,8 @@
 
 // set pin 10 as the slave select for the digital pot:
 const int slaveSelectPin = 10;
-const int SAMBA_SENSOR_PIN = 14;
-const int SAMBA_GAIN_POT = 2; // corresponds to pins B3 and W3 on the AD5204 or AD5206
+const int INPUT_SELECT_PIN = 17;
+int GAIN_POT;
 
 // these numbers are based on a 16 bit ADC which has 2^16 = 65536 counts
 const int MIN_SIGNAL_AMPLITUDE = 10000; // ~0.76 V from the noninverting amplifier
@@ -39,9 +39,9 @@ const int MAX_SIGNAL_AMPLITUDE = 55000; // ~4.20 V from the noninverting amplifi
 // a higher number results in a faster correction
 const int CORRECTION = 10; 
 
-volatile int potentiometerValue = 0; // range 0-256 where 0 -> ~84 ohms and 256 -> ~50 k-ohms
+volatile int potentiometerValue = 200; // range 0-256 where 0 -> ~84 ohms and 256 -> ~50 k-ohms
 // if gain is being shifted up or down, this gives the stopping value
-volatile int targetPotentiometerValue = 0; 
+volatile int targetPotentiometerValue = potentiometerValue; 
 
 const int WINDOW_PERIOD = 50; // number of 100ms increments
 volatile int windowCount = 0; // gain is adjusted when windowCount exceeds WINDOW PERIOD
@@ -68,9 +68,17 @@ void digitalPotWrite(const int address, int value) {
 }
 
 void setupGainAdjustment() {
+    bool analogInputSelect = digitalRead(INPUT_SELECT_PIN);
+
+    if (analogInputSelect) {
+        GAIN_POT = 2;
+    } else {
+        GAIN_POT = 3;
+    }
+
     pinMode (slaveSelectPin, OUTPUT);
-    spi4teensy3::init();
-    digitalPotWrite(SAMBA_GAIN_POT, 0); // start with unity gain to avoid clipping
+    spi4teensy3::init(); // the teensy has a hardware SPI module, this sets it up
+    digitalPotWrite(GAIN_POT, 0); // start with unity gain to avoid clipping
 }
 
 // algorithm:
@@ -79,17 +87,18 @@ void setupGainAdjustment() {
 // if the signal doesn't meet these criteria, it will be increased or decreased until its max
 // ampitude passes TARGET_AMPLITUDE, or the amplifier reaches maximum or minimum gain
 void adjustGain(const int sensor_value) {
+    Serial.printf("pot value: %d, target pot value: %d \n", potentiometerValue, targetPotentiometerValue);
     // adjust potentiometer value if required (done in steps of 1 count for smoothness)
 
     // increase the pot value by one count
     if (potentiometerValue < targetPotentiometerValue) {
         potentiometerValue += 1;
-        digitalPotWrite(SAMBA_GAIN_POT, potentiometerValue);
+        digitalPotWrite(GAIN_POT, potentiometerValue);
     }
     // decrease the pot value by one count
     if (potentiometerValue > targetPotentiometerValue) {
         potentiometerValue -= 1;
-        digitalPotWrite(SAMBA_GAIN_POT, potentiometerValue);
+        digitalPotWrite(GAIN_POT, potentiometerValue);
     }
 
     // check if this sample is out of bounds
@@ -127,13 +136,13 @@ void adjustGain(const int sensor_value) {
         if (seekState == 2) {
             if (!targetExceeded) {
                 seekState = 0;
-            } else if (potentiometerValue >= 0 + CORRECTION) {
+            } else if (potentiometerValue > 0 + CORRECTION) {
                 targetPotentiometerValue -= CORRECTION;
             } else {
                 return;
             }
         }
-
+        Serial.printf("state: %d, minExceeded: %d, targetExceeded: %d, maxExceeded: %d,  pot value: %d \n", seekState, minExceeded, targetExceeded, maxExceeded, potentiometerValue);
         // reset state
         minExceeded = false;
         targetExceeded = false;

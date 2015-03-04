@@ -14,9 +14,9 @@ IntervalTimer sampletimer;
 
 const int SAMPLING_PERIOD = 4; // milliseconds
 const int TRIGGER_PULSE_DURATION = 20; // milliseconds
-const int ANALOG_INPUT_PIN = 15;
-const int SCANNER_TRIGGER_PIN = 4;
-const int LED_PIN = 12;
+const int SCANNER_TRIGGER_PIN = 19;
+const int LED_PIN = 18;
+int ANALOG_INPUT_PIN;
 const int PULSE_DURATION = TRIGGER_PULSE_DURATION / SAMPLING_PERIOD;
 const int GAIN_ADJUST_PERIOD = 100; // milliseconds
 const int gainAdjustDuration = GAIN_ADJUST_PERIOD / SAMPLING_PERIOD;
@@ -29,9 +29,20 @@ peakDetect pd;
 
 void setup() {
     Serial.begin(115200); // fastest possible BAUD rate
+    analogReadRes(16);  // the teensy has 16 bit ADCs
     pinMode(SCANNER_TRIGGER_PIN, OUTPUT);
     pinMode(LED_PIN, OUTPUT);
-    // hardware clock triggers interrupts every x microseconds and calls the given ISR
+    pinMode(INPUT_SELECT_PIN, INPUT);
+
+    bool analogInputSelect = digitalRead(INPUT_SELECT_PIN);
+
+    if(analogInputSelect) { // switch right --> transonic
+        ANALOG_INPUT_PIN = 14; 
+    } else { // switch left --> samba
+        ANALOG_INPUT_PIN = 15;
+    }
+
+    // hardware clock interrupt service routine calls the sample routine every x microseconds
     sampletimer.begin(sample, SAMPLING_PERIOD * 1000);
     setupGainAdjustment();
 }
