@@ -1,4 +1,4 @@
-import ui_plot
+import ui_trigger
 
 import sys
 
@@ -9,13 +9,13 @@ if __name__ == "__main__":
 
     ### SET-UP WINDOWS
     
-    # WINDOW plot
-    win_plot = ui_plot.QtGui.QMainWindow()
-    uiplot = ui_plot.Ui_win_plot()
-    uiplot.setupUi(win_plot)
+    # WINDOW trigger
+    win_trigger = ui_trigger.QtGui.QMainWindow()
+    uitrigger = ui_trigger.Ui_win_trigger()
+    uitrigger.setupUi(win_trigger)
 
     ### DISPLAY WINDOWS
-    win_plot.show()
+    win_trigger.show()
 
     #WAIT UNTIL QT RETURNS EXIT CODE
     sys.exit(app.exec_())

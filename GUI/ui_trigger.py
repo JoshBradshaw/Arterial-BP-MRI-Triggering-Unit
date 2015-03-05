@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_trigger.ui'
 #
-# Created: Wed Mar 04 15:57:57 2015
+# Created: Thu Mar 05 08:57:15 2015
 #      by: PyQt4 UI code generator 4.9.6
 #
 # WARNING! All changes made in this file will be lost!

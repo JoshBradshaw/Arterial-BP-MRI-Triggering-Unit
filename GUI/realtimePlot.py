@@ -1,9 +1,16 @@
-import bp_trigger_plot
+from __future__ import division
+
+import ui_trigger
 import sys
 import numpy
-from PyQt4 import QtCore, QtGui
+from PyQt4 import QtCore, QtGui, Qt
 import PyQt4.Qwt5 as Qwt
 import serial
+import serial.tools.list_ports
+
+
+TRIGGER_PULSE_CODE = 100000
+SIXTEEN_BIT_TO_COUNTS = 13107.2
 
 ser = serial.Serial()
 ser.baudrate = 115200
@@ -11,43 +18,120 @@ ser.port = 'COM14'
 ser.timeout = 1
 ser.open()
 
-numPoints=100
-xs=numpy.arange(numPoints)
-ys=numpy.zeros(numPoints)
 
-def plotSomething():
+def setup_scale():
+    global xs
     global ys
-    ys=numpy.roll(ys, -1)
+    global trigger
+    global LAST_POINT
+    global ts
+
+    xs=numpy.arange(0, 4, 0.016)
+    numPoints = len(xs)
+    LAST_POINT = numPoints-1
+    ys=numpy.zeros(numPoints)
+    ts=numpy.zeros(numPoints)
+    trigger = False
+
+def serial_port_chosen():
+    print gui.serialPortSelector.currentText()
+    return
+
+def speed_selected():
+    print gui.speedSelect.currentText()
+    return
+
+def start_pressed():
+    print gui.startBtn.isChecked()
+    return
+
+def log_data_pressed():
+    print gui.logDataButton.isChecked()
+    return
+
+
+def plot_bp_and_trigger():
+    global ys
+    global ts
+    global trigger
+
     try:
-        ys.flat[99] = int(ser.readline())
+        val = int(ser.readline())
     except ValueError:
-        print "caught valurerror"
-        ys.flat[99] = ys.flat[98]
-    #print "PLOTTING"
-    c.setData(xs, ys)
-    bpplot.qwtPlot.replot()   
+        print "failed to parse serial input"
+        return
+
+    if val == TRIGGER_PULSE_CODE:
+        trigger = True
+        return
+    else:
+        ys=numpy.roll(ys, -1)
+        ts=numpy.roll(ts, -1)  
+
+        ys[LAST_POINT] = val / SIXTEEN_BIT_TO_COUNTS
+
+        if trigger:
+            ts[LAST_POINT] = 1
+            trigger = False
+        else:
+            ts[LAST_POINT] = 0
+            
+
+        bp_curve.setData(xs, ys)
+        gui.bpPlot.replot() 
+        trigger_curve.setData(xs, ts)
+        gui.triggerPlot.replot()  
+
+    
 
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
 
     ### SET-UP WINDOWS
-    
-    # WINDOW plot
-    win_plot = bp_trigger_plot.QtGui.QMainWindow()
-    bpplot = bp_trigger_plot.Ui_win_trigger()
-    bpplot.setupUi(win_plot)
-    bpplot.btnA.clicked.connect(plotSomething)
-    bpplot.btnB.clicked.connect(lambda: bpplot.timer.setInterval(100.0))
-    bpplot.btnC.clicked.connect(lambda: bpplot.timer.setInterval(10.0))
-    bpplot.btnD.clicked.connect(lambda: bpplot.timer.setInterval(1.0))
-    c=Qwt.QwtPlotCurve()  
-    c.attach(uiplot.qwtPlot)
+    ## get all serial ports
 
-    uiplot.timer = QtCore.QTimer()
-    uiplot.timer.start(100.0)
+
+    # WINDOW plot
+    setup_scale()
+    win_plot = ui_trigger.QtGui.QMainWindow()
+    gui = ui_trigger.Ui_win_trigger()
+    gui.setupUi(win_plot)
+    gui.bpPlot.setAxisScale(0, 0, 5, 5)
+    gui.bpPlot.setAxisScale(1, 0, 4, 4)
+    gui.bpPlot.setAxisTitle(0, "BP Signal (V)")
+    gui.triggerPlot.setAxisScale(0, 0, 1, 1)
+    gui.triggerPlot.setAxisMaxMinor(0, 1)
+    gui.triggerPlot.setAxisTitle(0, "Logic Level")
+    gui.triggerPlot.setCanvasBackground(Qt.Qt.black)
+
+    port_option = {}
+    for port, description, details in serial.tools.list_ports.comports():
+        port_option[port] = description
+        gui.serialPortSelector.addItem(port_option[port])
     
-    win_plot.connect(uiplot.timer, QtCore.SIGNAL('timeout()'), plotSomething) 
-    
+    gui.timer = QtCore.QTimer()
+    gui.timer.start(100.0)
+    gui.timer.setInterval(1.0)
+
+    bp_curve=Qwt.QwtPlotCurve()  
+    bp_curve.attach(gui.bpPlot)
+    bp_curve.setPaintAttribute(Qwt.QwtPlotCurve.PaintFiltered, False)
+    bp_curve.setPaintAttribute(Qwt.QwtPlotCurve.ClipPolygons, True)
+    bp_curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
+    bp_curve.setPen(Qt.QPen(Qt.Qt.green))
+
+    trigger_curve = Qwt.QwtPlotCurve()
+    trigger_curve.attach(gui.triggerPlot)
+    trigger_curve.setPaintAttribute(Qwt.QwtPlotCurve.PaintFiltered, False)
+    trigger_curve.setPaintAttribute(Qwt.QwtPlotCurve.ClipPolygons, True)
+    trigger_curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
+    trigger_curve.setPen(Qt.QPen(Qt.Qt.green))
+
+    win_plot.connect(gui.timer, QtCore.SIGNAL('timeout()'), plot_bp_and_trigger) 
+    win_plot.connect(gui.serialPortSelector, QtCore.SIGNAL('activated(QString)'), serial_port_chosen)
+    win_plot.connect(gui.speedSelect, QtCore.SIGNAL('activated(QString)'), speed_selected)
+    win_plot.connect(gui.startBtn, QtCore.SIGNAL('released()'), start_pressed)
+    win_plot.connect(gui.logDataButton, QtCore.SIGNAL('released()'), log_data_pressed)
 
     ### DISPLAY WINDOWS
     win_plot.show()
