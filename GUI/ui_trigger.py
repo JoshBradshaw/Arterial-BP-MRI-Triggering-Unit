@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_trigger.ui'
 #
-# Created: Thu Mar 05 11:00:04 2015
+# Created: Thu Mar 05 14:03:20 2015
 #      by: PyQt4 UI code generator 4.9.6
 #
 # WARNING! All changes made in this file will be lost!
@@ -355,6 +355,7 @@ class Ui_win_trigger(object):
         self.speedSelect.addItem(_fromUtf8(""))
         self.speedSelect.addItem(_fromUtf8(""))
         self.speedSelect.addItem(_fromUtf8(""))
+        self.speedSelect.addItem(_fromUtf8(""))
         self.gridLayout.addWidget(self.speedSelect, 4, 2, 1, 2)
         self.label_2 = QtGui.QLabel(self.centralwidget)
         self.label_2.setObjectName(_fromUtf8("label_2"))
@@ -373,12 +374,13 @@ class Ui_win_trigger(object):
     def retranslateUi(self, win_trigger):
         win_trigger.setWindowTitle(_translate("win_trigger", "MainWindow", None))
         self.logDataButton.setToolTip(_translate("win_trigger", "<html><head/><body><p>If toggled on, log files will be created based on the triggering data.</p></body></html>", None))
-        self.logDataButton.setText(_translate("win_trigger", "LOG TRIGGERING DATA", None))
+        self.logDataButton.setText(_translate("win_trigger", "Open Log Directory", None))
         self.startBtn.setToolTip(_translate("win_trigger", "<html><head/><body><p>Start plotting the trigger and sensor data</p></body></html>", None))
         self.startBtn.setText(_translate("win_trigger", "START", None))
-        self.speedSelect.setItemText(0, _translate("win_trigger", "Slow", None))
-        self.speedSelect.setItemText(1, _translate("win_trigger", "Medium", None))
-        self.speedSelect.setItemText(2, _translate("win_trigger", "Fast", None))
+        self.speedSelect.setItemText(0, _translate("win_trigger", "Slowest", None))
+        self.speedSelect.setItemText(1, _translate("win_trigger", "Slow", None))
+        self.speedSelect.setItemText(2, _translate("win_trigger", "Medium", None))
+        self.speedSelect.setItemText(3, _translate("win_trigger", "Fast", None))
         self.label_2.setText(_translate("win_trigger", "Scanner Trigger Plot", None))
         self.label.setText(_translate("win_trigger", "Blood Pressure Signal Plot", None))
 

@@ -341,7 +341,7 @@ QMenu::separator {
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If toggled on, log files will be created based on the triggering data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string>LOG TRIGGERING DATA</string>
+       <string>Open Log Directory</string>
       </property>
       <property name="checkable">
        <bool>true</bool>
@@ -369,6 +369,11 @@ QMenu::separator {
     </item>
     <item row="4" column="2" colspan="2">
      <widget class="QComboBox" name="speedSelect">
+      <item>
+       <property name="text">
+        <string>Slowest</string>
+       </property>
+      </item>
       <item>
        <property name="text">
         <string>Slow</string>
