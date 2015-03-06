@@ -62,7 +62,7 @@
         <!-- When no internet load JQuery from local -->
         <script>window.jQuery || document.write('<script src="{{'/assets/js/jquery.min.js' | prepend: site.baseurl | prepend: site.url }}"><\/script>')</script>
         <!-- Site js -->
-        <script src="{{ site.url }}/assets/js/all.js"></script>
+        <script src="{{ '/assets/js/all.js' | prepend: site.baseurl | prepend: site.url }}"></script>
         <!-- Google analytics  -->
         {% include google-analytics.html %}
     </body>        
