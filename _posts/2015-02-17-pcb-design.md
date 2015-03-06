@@ -19,15 +19,15 @@ The Teensy eagle CAD library used in this design is available at the [PJRC websi
 
 ## Design:
 
-![alt text]({{ site.url }}/images/pcb_layout.png "Circuit board layout")
+![alt text]({{ 'images/pcb_layout.png' | prepend: site.baseurl | prepend: site.url }} "Circuit board layout")
 
 ## Bare Board:
 
-![alt text]({{ site.url }}/images/bare_board.JPG "Circuit board layout")
+![alt text]({{'images/bare_board.JPG' | prepend: site.baseurl | prepend: site.url }} "Circuit board layout")
 
 ## Assembled Board:
 
-![alt text]({{ site.url }}/images/assembled_board.JPG "Circuit board layout")
+![alt text]({{ 'images/assembled_board.JPG' | prepend: site.baseurl | prepend: site.url }} "Circuit board layout")
 
 ## Things to fix in subsequent revisions
 

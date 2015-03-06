@@ -22,7 +22,7 @@ The algorithm is based upon the following requirements and so forth:
 Below is an image of an idealized arterial blood pressure pulse:
 
 
-![alt text]({{ site.url }}/images/ideal_arterial_blood_pressure_pulse.gif "An arterial blood pressure pulse")
+![alt text]({{'images/ideal_arterial_blood_pressure_pulse.gif' | prepend: site.baseurl | prepend: site.url }} "An arterial blood pressure pulse")
 
 As you can see, there's a large pulse followed by a small reflection pulse just after the dichrontic notch. For the purposes of MRI triggering, the second pulse is not useful information. 
 
@@ -30,11 +30,11 @@ To remove the second peak and establish a consistent baseline, I applied slope s
 
 The slope sum function is:
 
-![alt text]({{ site.url }}/images/slope_sum_function.png "the slope sum function")
+![alt text]({{'images/slope_sum_function.png' | prepend: site.baseurl | prepend: site.url }} "the slope sum function")
 
 Here's an example blood pressure recording (in blue) and the corresponding slope sum function output (in red):
 
-<img src="{{ site.url }}/images/ssf_demo.png" alt="Slope Sum funciton applied to blood pressure waveform" style="width: 600px;"/>
+<img src="{{ 'images/ssf_demo.png' | prepend: site.baseurl | prepend: site.url }}" alt="Slope Sum funciton applied to blood pressure waveform" style="width: 600px;"/>
 
 This simple function is extrememly useful for two reasons:
 
@@ -61,7 +61,7 @@ When the state-machine is in rising state, it is constantly checking whether the
 
 The state-machine sends a 3.3V TTL signal the to MRI scanner. For Siemens scanners the TTL signal is required to meet these criteria:
 
-![alt text]({{ site.url }}/images/siemens_external_trigger.png "the slope sum function applied to a human arterial blood pressure waveform")
+![alt text]({{'images/siemens_external_trigger.png site.url' | prepend: site.baseurl | prepend: site.url}} "the slope sum function applied to a human arterial blood pressure waveform")
 
 #### REFRACTORY PERIOD
 
