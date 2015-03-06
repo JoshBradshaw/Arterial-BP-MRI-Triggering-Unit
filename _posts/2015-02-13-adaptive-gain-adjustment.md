@@ -26,13 +26,13 @@ Based on these estimates I calculated the minimum possible gain range to be 1x -
 
 I opted to use this whitepaper as the basis of my design: [CN0112: Variable Gain Noninverting Amplifier Using the AD5292 Digital Potentiometer and the OP184 Op Amp](http://www.analog.com/en/circuits-from-the-lab/cn0112/vc.html).
 
-![alt text]({{ 'images/linear_variable_gain_adjust.jpg' | prepend: site.baseurl | prepend: site.url}})
+![alt text]({{ '/images/linear_variable_gain_adjust.jpg' | prepend: site.baseurl | prepend: site.url}})
 
 I chose this circuit because it offered an appropriate gain adjustment range, and because the [teensy has an excellent high speed SPI library for sending values to the digital potentiometer](https://www.pjrc.com/teensy/td_libs_SPI.html).
 
 I started by patching up a simple non-inverting amplifier, on a breadboard like so:
 
-<img src="{{ site.url }}/images/gain_adjust_amplifier.JPG" alt="Slope Sum function applied to blood pressure waveform" style="width: 600px;"/>
+<img src="{{ '/images/gain_adjust_amplifier.JPG' | replace:'index.html','' | prepend: site.url }}" alt="Slope Sum function applied to blood pressure waveform" style="width: 600px;"/>
 
 This amplifier had an adjustable gain range of 1.1 V/V to 11 V/V with 256 subdivisions. This is more than enough gain to amplify a 70/30 mmHg signal to the full range of the ADC.
 
