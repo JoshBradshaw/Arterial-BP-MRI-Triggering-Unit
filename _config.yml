@@ -1,10 +1,10 @@
 # Harmony Jekyll theme general configurations 
 
 # Base URL
-baseurl: '/Arterial-BP-MRI-Triggering-Unit/'
+baseurl: ''
 
 # Site live URL
-url: ''
+url: 'http://joshbradshaw.github.io/Arterial-BP-MRI-Triggering-Unit/'
 
 # Localhost 
 # url: http://127.0.0.1:4000  
