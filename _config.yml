@@ -1,7 +1,7 @@
 # Harmony Jekyll theme general configurations 
 
 # Base URL
-baseurl: ''
+baseurl: '/Arterial-BP-MRI-Triggering-Unit/'
 
 # Site live URL
 url: ''
