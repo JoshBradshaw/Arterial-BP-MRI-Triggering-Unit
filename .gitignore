@@ -6,6 +6,7 @@
 
 #log files
 .log
+logs/
 
 # Precompiled Headers
 *.gch
