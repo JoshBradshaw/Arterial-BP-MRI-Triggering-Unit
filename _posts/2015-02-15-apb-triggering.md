@@ -61,7 +61,7 @@ When the state-machine is in rising state, it is constantly checking whether the
 
 The state-machine sends a 3.3V TTL signal the to MRI scanner. For Siemens scanners the TTL signal is required to meet these criteria:
 
-![alt text]({{'/images/siemens_external_trigger.png site.url' | prepend: site.baseurl | prepend: site.url}} "the slope sum function applied to a human arterial blood pressure waveform")
+![alt text]({{'/images/siemens_external_trigger.png' | prepend: site.baseurl | prepend: site.url}} "the slope sum function applied to a human arterial blood pressure waveform")
 
 #### REFRACTORY PERIOD
 

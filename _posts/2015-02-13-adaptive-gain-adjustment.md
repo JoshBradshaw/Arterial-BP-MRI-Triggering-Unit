@@ -32,7 +32,7 @@ I chose this circuit because it offered an appropriate gain adjustment range, an
 
 I started by patching up a simple non-inverting amplifier, on a breadboard like so:
 
-<img src="{{ '/images/gain_adjust_amplifier.JPG' | replace:'index.html','' | prepend: site.url }}" alt="Slope Sum function applied to blood pressure waveform" style="width: 600px;"/>
+<img src="{{ '/images/gain_adjust_amplifier.JPG' | prepend: site.baseurl | prepend: site.url }}" alt="Slope Sum function applied to blood pressure waveform" style="width: 600px;"/>
 
 This amplifier had an adjustable gain range of 1.1 V/V to 11 V/V with 256 subdivisions. This is more than enough gain to amplify a 70/30 mmHg signal to the full range of the ADC.
 
