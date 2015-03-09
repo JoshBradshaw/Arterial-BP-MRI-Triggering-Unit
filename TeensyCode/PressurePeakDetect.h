@@ -1,7 +1,7 @@
 #ifndef __PRESSUREPEAKDETECTH__
 #define __PRESSUREPEAKDETECTH__
 
-const int BUFFER_LEN = 32; // determines how many samples will be stored at a time
+const int BUFFER_LEN = 15; // determines how many samples will be stored at a time
 
 class cicularBuffer {
     // old items overwrite new items
@@ -92,6 +92,12 @@ class peakDetect {
         volatile int peak2 = 0;
         volatile int peak3 = 0;
         volatile int peak4 = 0;
+        volatile int peak5 = 0;
+        volatile int peak6 = 0;
+        volatile int peak7 = 0;
+        volatile int peak8 = 0;
+        volatile int peak9 = 0;
+        volatile int peak10 = 0;
     public:
         void updatePeakThreshold(int newPeakVal) {
             peak_threshold_sum -= peak1;
@@ -100,9 +106,15 @@ class peakDetect {
             peak1 = peak2;
             peak2 = peak3;
             peak3 = peak4;
-            peak4 = newPeakVal;
+            peak4 = peak5;
+            peak5 = peak6;
+            peak6 = peak7;
+            peak7 = peak8;
+            peak8 = peak9;
+            peak9 = peak10;
+            peak10 = newPeakVal;
             
-            peak_threshold = peak_threshold_sum / 8;
+            peak_threshold = peak_threshold_sum / 25;
         }
         
         void updateMovingAverages() {
