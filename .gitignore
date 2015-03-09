@@ -8,6 +8,9 @@
 .log
 logs/
 
+# docs site
+site/
+
 # test data
 test_data/
 
