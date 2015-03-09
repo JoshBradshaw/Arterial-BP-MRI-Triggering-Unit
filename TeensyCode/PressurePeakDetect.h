@@ -83,7 +83,7 @@ class peakDetect {
         volatile bool rising = true;
         volatile int left_moving_sum = 0;
         volatile int right_moving_sum = 0;
-        volatile int refractory_period = 60;
+        volatile int refractory_period = 40;
         volatile int peak_threshold = 0;
         volatile int peak_threshold_sum = 0;
         volatile int rp_counter = 0;

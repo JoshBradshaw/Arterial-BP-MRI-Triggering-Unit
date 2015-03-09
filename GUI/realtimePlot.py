@@ -16,9 +16,9 @@ SIXTEEN_BIT_TO_COUNTS = 13107.2
 SERIAL_BAUDRATE = 115200
 
 speeds = {
-    'Slowest': 30,
-    'Slow': 16,
-    'Medium': 8,
+    'Slowest': 40,
+    'Slow': 20,
+    'Medium': 10,
     'Fast': 4
 }
 
@@ -93,6 +93,10 @@ class Teensy(object):
         self.ser.port = self.get_serial_port()
         self.ser.open()
 
+    def stop(self):
+        if self.ser.isOpen():
+            self.ser.close()
+
     def get_sensor_val(self):
         assert(self.ser.isOpen(), "Serial communications have not started, can not get value")
 
@@ -154,6 +158,7 @@ class plotData(object):
             win_plot.connect(gui.timer, QtCore.SIGNAL('timeout()'), self.plot_bp_and_trigger) 
         else:
             gui.timer.stop()
+            self.teensy.stop()
         
 
 if __name__ == '__main__':

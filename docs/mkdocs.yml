@@ -1,1 +1,17 @@
-site_name: My Docs
+site_name: Arterial BP Triggering
+
+site_description: 
+
+repo_url: https://github.com/JoshBradshaw
+
+pages:
+- ['index.md', 'System Overview']
+- ['build_log/apb-triggering.md', 'Build Log', 'Triggering Algorithm']
+- ['build_log/set-adaptive-gain-algorithm.md', 'Build Log', 'Gain Adjustment Algorithm']
+- ['build_log/adaptive-gain-adjustment.md', 'Build Log', 'Variable Gain Amplifier']
+- ['build_log/gui-design.md', 'Build Log', 'Monitoring Tool']
+- ['build_log/pcb-design.md', 'Build Log', 'PCB']
+
+
+copyright: Copyright &copy; 2014, <a href="https://twitter.com/_tomchristie">Tom Christie</a>.
+google_analytics: ['UA-27795084-5', 'mkdocs.org']

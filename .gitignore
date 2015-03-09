@@ -8,6 +8,9 @@
 .log
 logs/
 
+# test data
+test_data/
+
 # Precompiled Headers
 *.gch
 *.pch
