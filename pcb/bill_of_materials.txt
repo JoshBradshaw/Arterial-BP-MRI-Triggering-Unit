@@ -1,0 +1,16 @@
+Teensy 3.1 from pjrc.com with header pins
+
+part: AD5206BRZ50 package: SOIC-24 quantity: 1
+part: OPA4340UA/2K5 package: SOIC-14 quantity: 1
+
+part: 5.1k surface mount resistor package: 0805 quantity: 4
+part: 10k surface mount resistor package: 0805 quantity: 4
+part: 681 ohm surface mount resistor package: 0805 quantity: 3
+part: 10pF surface mount capacitor package: 0805 quantity: 2
+part: 0.1uF surface mount capacitor package: 0805 quantity: 3
+
+Other parts (I got these at the hardware store)
+A case or project box
+SPDT switch
+LEDs (must be <3.3V and >5mA max current)
+BNC, SVIDEO, RCA connectors (or whatever suits your equipment best)
