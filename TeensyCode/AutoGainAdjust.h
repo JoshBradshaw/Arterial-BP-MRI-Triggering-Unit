@@ -43,7 +43,7 @@ volatile int potentiometerValue = 0; // range 0-256 where 0 -> ~84 ohms and 256 
 // if gain is being shifted up or down, this gives the stopping value
 volatile int targetPotentiometerValue = potentiometerValue; 
 
-const int WINDOW_PERIOD = 50; // number of 100ms increments
+const int WINDOW_PERIOD = 50; // 50 x 100ms = 5s
 volatile int windowCount = 0; // gain is adjusted when windowCount exceeds WINDOW PERIOD
 
 volatile bool minExceeded = false;
@@ -71,9 +71,9 @@ void setupGainAdjustment() {
     bool analogInputSelect = digitalRead(INPUT_SELECT_PIN);
 
     if (analogInputSelect) {
-        GAIN_POT = 2;
+        GAIN_POT = 2; // samba signal pathway is connected to B4 and W4 which is pot 2 (zero indexing)
     } else {
-        GAIN_POT = 3;
+        GAIN_POT = 3; // transonic signal pathway is connected to B3 and W3 which is pot 2 (zero indexing)
     }
 
     pinMode (slaveSelectPin, OUTPUT);

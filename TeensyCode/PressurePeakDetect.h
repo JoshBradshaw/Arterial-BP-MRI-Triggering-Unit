@@ -3,11 +3,12 @@
 
 const int BUFFER_LEN = 15; // determines how many samples will be stored at a time
 
-class cicularBuffer {
+class circularBuffer {
     // old items overwrite new items
     // item 0 is the oldest, item BUFFER_LEN -1 is the newest
     public:
-        cicularBuffer() {
+        circularBuffer() {
+            // initialize to all zeros, so that the moving averages on sames initialize to reasonable values
             for(int ii=0; ii < BUFFER_LEN; ii++) {
                 addSample(0);
             }
@@ -49,7 +50,7 @@ class slopesum {
         slopesum(void) {}
     private:
         int slope_sum = 0;
-        cicularBuffer sampleBuffer; // filtered samples
+        circularBuffer sampleBuffer; // filtered samples
     public:
         int step(const int x) { 
             // the result of this recursive calculation is equivilant to adding all of the positive
@@ -79,42 +80,28 @@ class peakDetect {
     public:
         peakDetect() {}
     private:
-        cicularBuffer sb; // ssf samples
+        circularBuffer sb; // ssf samples
+        circularBuffer pb; // peak values
+
         volatile bool rising = true;
         volatile int left_moving_sum = 0;
         volatile int right_moving_sum = 0;
-        volatile int refractory_period = 40;
+        volatile int refractory_period = 40; // 40 samples at 250Hz = 160ms which gives 375BPM maximum heart rate
+        volatile int rp_counter = 0;
         volatile int peak_threshold = 0;
         volatile int peak_threshold_sum = 0;
-        volatile int rp_counter = 0;
-        
-        volatile int peak1 = 0;
-        volatile int peak2 = 0;
-        volatile int peak3 = 0;
-        volatile int peak4 = 0;
-        volatile int peak5 = 0;
-        volatile int peak6 = 0;
-        volatile int peak7 = 0;
-        volatile int peak8 = 0;
-        volatile int peak9 = 0;
-        volatile int peak10 = 0;
+
     public:
         void updatePeakThreshold(int newPeakVal) {
-            peak_threshold_sum -= peak1;
+            // peak threshold averaged over the last BUFFER_LEN peaks
+            // averaging over more peaks makes reduces sensitivity to amplitude spikes 
+            // thresholds are set at ~1/3 of the average amplitude, because testing showed
+            // that they don't need to be very high
+            peak_threshold_sum -= pb[0];
             peak_threshold_sum += newPeakVal;
+            pb.addSample(newPeakVal);
             
-            peak1 = peak2;
-            peak2 = peak3;
-            peak3 = peak4;
-            peak4 = peak5;
-            peak5 = peak6;
-            peak6 = peak7;
-            peak7 = peak8;
-            peak8 = peak9;
-            peak9 = peak10;
-            peak10 = newPeakVal;
-            
-            peak_threshold = peak_threshold_sum / 25;
+            peak_threshold = peak_threshold_sum / (BUFFER_LEN * 3);
         }
         
         void updateMovingAverages() {

@@ -2,7 +2,7 @@ site_name: Arterial BP Triggering
 
 site_description: 
 
-repo_url: https://github.com/JoshBradshaw
+repo_url: https://github.com/JoshBradshaw/Arterial-BP-MRI-Triggering-Unit
 
 pages:
 - ['index.md', 'System Overview']
@@ -11,7 +11,8 @@ pages:
 - ['build_log/adaptive-gain-adjustment.md', 'Build Log', 'Variable Gain Amplifier']
 - ['build_log/gui-design.md', 'Build Log', 'Monitoring Tool']
 - ['build_log/pcb-design.md', 'Build Log', 'PCB']
+- ['build_log/testing-australian-data.md', 'Build Log', 'Validation']
 
 
-copyright: Copyright &copy; 2014, <a href="https://twitter.com/_tomchristie">Tom Christie</a>.
-google_analytics: ['UA-27795084-5', 'mkdocs.org']
+copyright: Copyright &copy; 2015, <a href="https://twitter.com/_tomchristie">Josh Bradshaw</a>.
+google_analytics: 

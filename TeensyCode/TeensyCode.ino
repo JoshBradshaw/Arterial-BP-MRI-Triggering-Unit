@@ -31,7 +31,7 @@ slopesum ssf;
 peakDetect pd;
 
 void setup() {
-    Serial.begin(115200); // fastest possible BAUD rate
+    Serial.begin(115200); // fastest stable BAUD rate
     analogReadRes(16);  // the teensy has 16 bit ADCs
     pinMode(SCANNER_TRIGGER_PIN, OUTPUT);
     pinMode(LED_PIN, OUTPUT);

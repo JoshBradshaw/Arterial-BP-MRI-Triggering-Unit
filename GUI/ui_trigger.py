@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_trigger.ui'
 #
-# Created: Thu Mar 05 14:03:20 2015
+# Created: Tue Mar 10 11:51:40 2015
 #      by: PyQt4 UI code generator 4.9.6
 #
 # WARNING! All changes made in this file will be lost!
@@ -341,8 +341,8 @@ class Ui_win_trigger(object):
         self.triggerPlot.setObjectName(_fromUtf8("triggerPlot"))
         self.gridLayout.addWidget(self.triggerPlot, 3, 0, 1, 6)
         self.logDataButton = QtGui.QPushButton(self.centralwidget)
-        self.logDataButton.setCheckable(True)
-        self.logDataButton.setChecked(True)
+        self.logDataButton.setCheckable(False)
+        self.logDataButton.setChecked(False)
         self.logDataButton.setObjectName(_fromUtf8("logDataButton"))
         self.gridLayout.addWidget(self.logDataButton, 4, 5, 1, 1)
         self.startBtn = QtGui.QPushButton(self.centralwidget)
