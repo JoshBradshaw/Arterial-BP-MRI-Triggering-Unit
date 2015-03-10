@@ -1,14 +1,14 @@
 /*
  This code adjusts the gain of a non-inverting amplifier to bring a pressure
- sensor's signal level into the ideal range for measurement with the 
+ sensor's signal level into the ideal range for measurement with the
  Teensy microntroller's ADC.
-  
- The AD5206 is SPI-compatible,and to command it, you send two bytes, 
+
+ The AD5206 is SPI-compatible,and to command it, you send two bytes,
  one with the channel number (0 - 5) and one with the resistance value for the
- channel (0 - 255).  
+ channel (0 - 255).
 
  LMC6464 is an instrumentation grade micropower rail-to-rail op-amp
- 
+
  The circuit:
  AD5206
   * CS - to digital pin 10  (SS pin) on Teensy
@@ -18,7 +18,7 @@
   * IN (-) A - connected to B3 on AD5206
   * IN (+) A - connected to Samba Sensor's analog signal output
   * OUT A - connected to W3 on AD5206 and pin 14 on Teensy
- 
+
 */
 
 #ifndef __AUTOGAINADJUST__
@@ -37,11 +37,11 @@ const int TARGET_AMPLITUDE = 35000; // ~2.67 V from the noninverting amplifier
 const int MAX_SIGNAL_AMPLITUDE = 55000; // ~4.20 V from the noninverting amplifier
 // number of potentiomter codes to correct by if signal is out of range
 // a higher number results in a faster correction
-const int CORRECTION = 10; 
+const int CORRECTION = 10;
 
 volatile int potentiometerValue = 0; // range 0-256 where 0 -> ~84 ohms and 256 -> ~50 k-ohms
 // if gain is being shifted up or down, this gives the stopping value
-volatile int targetPotentiometerValue = potentiometerValue; 
+volatile int targetPotentiometerValue = potentiometerValue;
 
 const int WINDOW_PERIOD = 50; // 50 x 100ms = 5s
 volatile int windowCount = 0; // gain is adjusted when windowCount exceeds WINDOW PERIOD
@@ -64,7 +64,7 @@ void digitalPotWrite(const int address, int value) {
     spi4teensy3::send(address);
     spi4teensy3::send(potentiometerValue);
     // take the SS pin high to de-select the chip:
-    digitalWrite(slaveSelectPin, HIGH); 
+    digitalWrite(slaveSelectPin, HIGH);
 }
 
 void setupGainAdjustment() {
@@ -103,7 +103,7 @@ void adjustGain(const int sensor_value) {
     // check if this sample is out of bounds
     if (sensor_value > MIN_SIGNAL_AMPLITUDE) {
         minExceeded = true;
-    } 
+    }
     if (sensor_value > MAX_SIGNAL_AMPLITUDE) {
         maxExceeded = true;
     }
@@ -112,7 +112,7 @@ void adjustGain(const int sensor_value) {
     }
     // this section runs every 5 seconds
     // checks if gain needs to be adjusted, and sets the new gain value if required
-    if (windowCount > WINDOW_PERIOD) {  
+    if (windowCount > WINDOW_PERIOD) {
         // check if min or max have been violated
         if (!minExceeded) {
             seekState = 1;

@@ -6,7 +6,7 @@ IntervalTimer sampletimer;
 
 // signal processing pathway to transform raw blood pressure input signal into
 // MRI triggering signal
-// Loosely based on the algorithm developed by Zong et. al at MIT in 
+// Loosely based on the algorithm developed by Zong et. al at MIT in
 // An Open-source Algorithm to Detect Onset of Arterial Blood Pressure Pulses
 // Computers in Cardiology, 2003; 30:259-262
 
@@ -40,7 +40,7 @@ void setup() {
     bool analogInputSelect = digitalRead(INPUT_SELECT_PIN);
 
     if(analogInputSelect) { // switch right --> transonic
-        ANALOG_INPUT_PIN = 14; 
+        ANALOG_INPUT_PIN = 14;
     } else { // switch left --> samba
         ANALOG_INPUT_PIN = 15;
     }
@@ -85,7 +85,7 @@ void sample() {
     } else {
         gainAdjustCount++;
     }
-    
+
     if (serial_update_count < SERIAL_UPDATE_PERIOD) {
         serial_update_count++;
     } else {

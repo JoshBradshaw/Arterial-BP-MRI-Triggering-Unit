@@ -42,9 +42,18 @@ IntervalTimer::ISR IntervalTimer::PIT_ISR[];
 // so that they can auto-clear themselves and so the user can
 // specify a custom ISR and reassign it as needed
 // ------------------------------------------------------------
-void pit0_isr() { PIT_TFLG0 = 1; IntervalTimer::PIT_ISR[0](); }
-void pit1_isr() { PIT_TFLG1 = 1; IntervalTimer::PIT_ISR[1](); }
-void pit2_isr() { PIT_TFLG2 = 1; IntervalTimer::PIT_ISR[2](); }
+void pit0_isr() {
+    PIT_TFLG0 = 1;
+    IntervalTimer::PIT_ISR[0]();
+}
+void pit1_isr() {
+    PIT_TFLG1 = 1;
+    IntervalTimer::PIT_ISR[1]();
+}
+void pit2_isr() {
+    PIT_TFLG2 = 1;
+    IntervalTimer::PIT_ISR[2]();
+}
 //void pit3_isr() { PIT_TFLG3 = 1; IntervalTimer::PIT_ISR[3](); }
 
 
@@ -59,22 +68,22 @@ void pit2_isr() { PIT_TFLG2 = 1; IntervalTimer::PIT_ISR[2](); }
 // period is specified as number of microseconds (millionths)
 // ------------------------------------------------------------
 bool IntervalTimer::begin(ISR newISR, uint32_t newPeriod) {
-  
-  // store callback pointer
-  myISR = newISR;
-  
-  // check range and calc value based on period
-  if (newPeriod == 0 || newPeriod > MAX_PERIOD) return false;
-  uint32_t newValue = F_BUS * (newPeriod / 1000000.0) - 1;
-  
-  // attempt to allocate this timer
-  if (allocate_PIT(newValue)) status = TIMER_PIT;
-  else status = TIMER_OFF;
-  
-  // check for success and return
-  if (status != TIMER_OFF) return true;
-  return false;
-  
+
+    // store callback pointer
+    myISR = newISR;
+
+    // check range and calc value based on period
+    if (newPeriod == 0 || newPeriod > MAX_PERIOD) return false;
+    uint32_t newValue = F_BUS * (newPeriod / 1000000.0) - 1;
+
+    // attempt to allocate this timer
+    if (allocate_PIT(newValue)) status = TIMER_PIT;
+    else status = TIMER_OFF;
+
+    // check for success and return
+    if (status != TIMER_OFF) return true;
+    return false;
+
 }
 
 
@@ -84,8 +93,8 @@ bool IntervalTimer::begin(ISR newISR, uint32_t newPeriod) {
 // to determine what hardware resources the timer may be using
 // ------------------------------------------------------------
 void IntervalTimer::end() {
-  if (status == TIMER_PIT) stop_PIT();
-  status = TIMER_OFF;
+    if (status == TIMER_PIT) stop_PIT();
+    status = TIMER_OFF;
 }
 
 
@@ -94,9 +103,9 @@ void IntervalTimer::end() {
 // enables the PIT clock bit, the master PIT reg, and sets flag
 // ------------------------------------------------------------
 void IntervalTimer::enable_PIT() {
-  SIM_SCGC6 |= SIM_SCGC6_PIT;
-  PIT_MCR = 0;
-  PIT_enabled = true;
+    SIM_SCGC6 |= SIM_SCGC6_PIT;
+    PIT_MCR = 0;
+    PIT_enabled = true;
 }
 
 
@@ -105,9 +114,9 @@ void IntervalTimer::enable_PIT() {
 // disables the master PIT reg, the PIT clock bit, and unsets flag
 // ------------------------------------------------------------
 void IntervalTimer::disable_PIT() {
-  PIT_MCR = 1;
-  SIM_SCGC6 &= ~SIM_SCGC6_PIT;
-  PIT_enabled = false;
+    PIT_MCR = 1;
+    SIM_SCGC6 &= ~SIM_SCGC6_PIT;
+    PIT_enabled = false;
 }
 
 
@@ -119,23 +128,23 @@ void IntervalTimer::disable_PIT() {
 // the function returns true, otherwise it returns false
 // ------------------------------------------------------------
 bool IntervalTimer::allocate_PIT(uint32_t newValue) {
-  
-  // enable clock to the PIT module if necessary
-  if (!PIT_enabled) enable_PIT();
-  
-  // check for an available PIT, and if so, start it
-  for (uint8_t id = 0; id < NUM_PIT; id++) {
-    if (!PIT_used[id]) {
-      PIT_id = id;
-      start_PIT(newValue);
-      PIT_used[id] = true;
-      return true;
+
+    // enable clock to the PIT module if necessary
+    if (!PIT_enabled) enable_PIT();
+
+    // check for an available PIT, and if so, start it
+    for (uint8_t id = 0; id < NUM_PIT; id++) {
+        if (!PIT_used[id]) {
+            PIT_id = id;
+            start_PIT(newValue);
+            PIT_used[id] = true;
+            return true;
+        }
     }
-  }
-  
-  // no PIT available
-  return false;
-  
+
+    // no PIT available
+    return false;
+
 }
 
 
@@ -145,19 +154,19 @@ bool IntervalTimer::allocate_PIT(uint32_t newValue) {
 // interrupts, effectively starting the timer upon completion
 // ------------------------------------------------------------
 void IntervalTimer::start_PIT(uint32_t newValue) {
-  
-  // point to the correct registers
-  PIT_LDVAL = &PIT_LDVAL0 + PIT_id * 4;
-  PIT_TCTRL = &PIT_TCTRL0 + PIT_id * 4;
-  IRQ_PIT_CH = IRQ_PIT_CH0 + PIT_id;
-  
-  // point to the correct PIT ISR
-  PIT_ISR[PIT_id] = myISR;
-  
-  // write value to register and enable interrupt
-  *PIT_LDVAL = newValue;
-  *PIT_TCTRL = 3;
-  NVIC_ENABLE_IRQ(IRQ_PIT_CH);
+
+    // point to the correct registers
+    PIT_LDVAL = &PIT_LDVAL0 + PIT_id * 4;
+    PIT_TCTRL = &PIT_TCTRL0 + PIT_id * 4;
+    IRQ_PIT_CH = IRQ_PIT_CH0 + PIT_id;
+
+    // point to the correct PIT ISR
+    PIT_ISR[PIT_id] = myISR;
+
+    // write value to register and enable interrupt
+    *PIT_LDVAL = newValue;
+    *PIT_TCTRL = 3;
+    NVIC_ENABLE_IRQ(IRQ_PIT_CH);
 
 }
 
@@ -169,22 +178,22 @@ void IntervalTimer::start_PIT(uint32_t newValue) {
 // also, if no PITs remain in use, disables the core PIT clock
 // ------------------------------------------------------------
 void IntervalTimer::stop_PIT() {
-  
-  // disable interrupt and PIT
-  NVIC_DISABLE_IRQ(IRQ_PIT_CH);
-  *PIT_TCTRL = 0;
-  
-  // free PIT for future use
-  PIT_used[PIT_id] = false;
-  
-  // check if we're still using any PIT
-  for (uint8_t id = 0; id < NUM_PIT; id++) {
-    if (PIT_used[id]) return;
-  }
-  
-  // none used, disable PIT clock
-  disable_PIT();
-  
+
+    // disable interrupt and PIT
+    NVIC_DISABLE_IRQ(IRQ_PIT_CH);
+    *PIT_TCTRL = 0;
+
+    // free PIT for future use
+    PIT_used[PIT_id] = false;
+
+    // check if we're still using any PIT
+    for (uint8_t id = 0; id < NUM_PIT; id++) {
+        if (PIT_used[id]) return;
+    }
+
+    // none used, disable PIT clock
+    disable_PIT();
+
 }
 
 
