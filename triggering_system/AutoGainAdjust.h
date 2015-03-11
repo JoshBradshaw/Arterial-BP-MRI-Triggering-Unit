@@ -33,7 +33,7 @@ int GAIN_POT;
 
 // these numbers are based on a 16 bit ADC which has 2^16 = 65536 counts
 const int MIN_SIGNAL_AMPLITUDE = 10000; // ~0.76 V from the noninverting amplifier
-const int TARGET_AMPLITUDE = 35000; // ~2.67 V from the noninverting amplifier
+int TARGET_AMPLITUDE; // ~2.67 V from the noninverting amplifier
 const int MAX_SIGNAL_AMPLITUDE = 55000; // ~4.20 V from the noninverting amplifier
 // number of potentiomter codes to correct by if signal is out of range
 // a higher number results in a faster correction
@@ -71,9 +71,11 @@ void setupGainAdjustment() {
     bool analogInputSelect = digitalRead(INPUT_SELECT_PIN);
 
     if (analogInputSelect) {
-        GAIN_POT = 2; // samba signal pathway is connected to B4 and W4 which is pot 2 (zero indexing)
+        GAIN_POT = 2; // transonic signal pathway is connected to B3 and W3 which is pot 2 (zero indexing)
+        TARGET_AMPLITUDE = 40000;
     } else {
-        GAIN_POT = 3; // transonic signal pathway is connected to B3 and W3 which is pot 2 (zero indexing)
+        GAIN_POT = 3; // samba
+        TARGET_AMPLITUDE = 35000;
     }
 
     pinMode (slaveSelectPin, OUTPUT);

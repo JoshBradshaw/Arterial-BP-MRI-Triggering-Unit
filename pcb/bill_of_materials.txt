@@ -1,4 +1,5 @@
 Teensy 3.1 from pjrc.com with header pins
+(you can easily solder your old 0.1" headers on if you wish)
 
 part: AD5206BRZ50 package: SOIC-24 quantity: 1
 part: OPA4340UA/2K5 package: SOIC-14 quantity: 1
