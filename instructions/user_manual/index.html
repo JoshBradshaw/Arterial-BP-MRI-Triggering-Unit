@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>User Manual - Arterial BP Triggering</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../../js/highlight.pack.js"></script>
+  <script src="../../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Arterial BP Triggering</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Build Log</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../build_log/apb-triggering">Triggering Algorithm</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../build_log/set-adaptive-gain-algorithm">Gain Adjustment Algorithm</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../build_log/adaptive-gain-adjustment">Variable Gain Amplifier</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../build_log/gui-design">Monitoring Tool</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../build_log/pcb-design">PCB</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../build_log/testing-australian-data">Validation</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Instructions</span>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">User Manual</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#user-manual">User Manual</a></li>
+                            
+                                <li><a class="toctree-l3" href="#setup-for-testing-with-the-analog-function-generator">Setup for Testing with the Analog Function Generator</a></li>
+                            
+                                <li><a class="toctree-l3" href="#setup-for-samba-202-pressure-measurement-system">Setup for Samba 202 Pressure Measurement System</a></li>
+                            
+                                <li><a class="toctree-l3" href="#setup-for-transonic-ts420-perivascular-flow-module">Setup for Transonic TS420 Perivascular Flow Module</a></li>
+                            
+                                <li><a class="toctree-l3" href="#troubleshooting">Troubleshooting</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../guidelines-for-adapting-to-new-instrument">Guidelines for using a Different Pressure Measurement System</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href="../.."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    <li>User Manual</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/JoshBradshaw/Arterial-BP-MRI-Triggering-Unit" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <h2 id="user-manual">User Manual</h2>
+<h3 id="setup-for-testing-with-the-analog-function-generator">Setup for Testing with the Analog Function Generator</h3>
+<p>USE CAUTION! The function generator's output can go up to 20V, which is enough to destroy the pressure trigger module. 
+To use it safely:</p>
+<ol>
+<li>Set the amplitude to minimum and tape it down. Optionally, you can pull the knob out to drop the function generator into the millivolts range.</li>
+<li>The offset is a little bit tricky to set, because this particular function generator sucks and the offset drifts noticeably from day to day. Pull the knob out engage the switch, and start by setting it to about halfway between 12:00 and 1:00. You can tweak it by a smidgen later to get it just right.</li>
+<li>To get the waveform looking as close to a arterial blood pressure pulse as possible, set the function to SINE WAVE the frequency range to 10Hz, pull the symmetry knob out to engage it and twist counter-clockwise to the stop. Finally, set the frequency selector knob to 0.2 (for 120 BPM), and leave sweep turned off.</li>
+<li>At this point you can either use the BNC -&gt; S-video adapter that I made to connect to the Samba input, or a standard BNC cable to connect to the Transonic input.</li>
+<li>Follow steps 7-9 of the Samba instructions and test the device.</li>
+</ol>
+<h3 id="setup-for-samba-202-pressure-measurement-system">Setup for Samba 202 Pressure Measurement System</h3>
+<p>If this is your first time handling the Samba probes, take the time to read the relevant sections of the Samba user manual (included in the box). For invasive measurements you will require distiled and de-ionized water for cleaning the transducer tip, which you can obtain from the wet lab on the 8th floor of the Peter Gilgan Center for Research and Learning wet lab (the dispenser is a blue nozzle attached to the main sink). Sterile glassware is available in the hallway that separates the dry lab from the wet lab, you're free to take what you need as long as you return it to the same station for autoclaving.</p>
+<ol>
+<li>Power up the Samba 202, it will take 1-3 minutes to stabilize the internal temperature.</li>
+<li>Connect the Samba pressure sensor to channel TWO of the pressure measurement system. Press firmly, because hearing a click does not necessarily mean that a good connection has been made. Be very careful to only handle the blue plastic connector and not the black stress relief on the cable. The fragility of these sensors can not be overstated. The reason we have to use channel two is that channel one is unreliable for unknown reasons, connector contamination is a possibility.</li>
+<li>Once the Samba unit recognizes the transducer press 1 to zero the transducer. The transducer should be zeroed in free air so that both the low and high blood pressures will give a positive pressure reading.</li>
+<li>At this point the Samba unit should be working properly and continuously measuring pressure. If you encounter a bad connection error or something along those lines check the manual for instructions. Now is the ideal time to insert the pressure transducer into the test subject.</li>
+<li>Connect the analog output of the Samba pressure sensor to the pressure trigger module using the S-Video cable provided (this cable has a transparent housing). The connection is labeled SAMBA.</li>
+<li>Ensure that the INPUT SELECT toggle switch is in the left position (facing the SAMBA input connector).</li>
+<li>Use the 25ft RCA cable to connect the trigger unit to the external trigger input on the MRI scanner. The external trigger input is on the left side of the scanner, and is marked with a little arrow directed inwards.</li>
+<li>Plug the USB cable attached to the pressure trigger module to a computer. Ensure that the computer is plugged in (not just running on battery). This is important, because not all laptops maintain a steady 5V USB voltage when they're running on battery power.</li>
+<li>Launch "software-name-here.exe" on the computer.</li>
+<li>Use the serial port selector (dropdown menu on bottom left corner) and choose the port called Teensy USB Serial.</li>
+<li>Press Start and watch to see whether the system is triggering as expected.</li>
+</ol>
+<h3 id="setup-for-transonic-ts420-perivascular-flow-module">Setup for Transonic TS420 Perivascular Flow Module</h3>
+<p>Note: I never actually had access to a TS420 during the design or testing of this instrument. I used the user manual of the device to get the relevant specifications and designed and tested the device based upon the manufacturer's description of its typical behavior. Thus, I can not guarantee that these instructions are complete, or that the device will work properly with the triggering system, especially if Transonic comes out with a new version.</p>
+<ol>
+<li>Follow Transonic's instructions for setting up their flow measurement system.</li>
+<li>Connect the flow measurement system to the the TRANSONIC input connector on the pressure trigger module using a standard BNC cable (our lab already has two short BNC cables, longer cables are available from Active Surplus or monoprice.com if required).</li>
+<li>Ensure that the input selection toggle switch is in the right position (facing the Transonic connector)</li>
+<li>Follow steps 7-9 of the Samba instructions.</li>
+</ol>
+<h3 id="troubleshooting">Troubleshooting</h3>
+<ol>
+<li>As with all electronics, if you have trouble with the device start with unplugging it and plugging it back in.</li>
+<li>The device only reads the value of the input selection switch once during startup, so the switch must be in the correct position BEFORE the pressure trigger module is powered up.</li>
+<li>The RCA connectors on the scanner are recessed and poorly placed, we've had trouble getting a good connection with the cable before. If there is any discrepancy between what the monitoring tool shows and the scanner's external triggering display, triple check the cables. If the RCA cable has any visible damage, replace it ($7 at Active Surplus) because even minor sheath damage will have serious consequences on the cable's ability to pass signal in the MR environment.</li>
+<li>The LED I wired into the device was of questionable quality, don't worry it stops working. You will still be able to use the monitoring software to see when the trigger signal has been sent.</li>
+<li>BNC connectors only make a good connection when the little thumb-turn sleeve is locked in place, double check them every time.</li>
+</ol>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../guidelines-for-adapting-to-new-instrument" class="btn btn-neutral float-right" title="Guidelines for using a Different Pressure Measurement System"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../../build_log/testing-australian-data" class="btn btn-neutral" title="Validation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../../build_log/testing-australian-data" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../guidelines-for-adapting-to-new-instrument" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>
