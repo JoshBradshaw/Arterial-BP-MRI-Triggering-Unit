@@ -12,6 +12,8 @@ pages:
 - ['build_log/gui-design.md', 'Build Log', 'Monitoring Tool']
 - ['build_log/pcb-design.md', 'Build Log', 'PCB']
 - ['build_log/testing-australian-data.md', 'Build Log', 'Validation']
+- ['instructions/user_manual.md', 'Instructions', 'User Manual']
+- ['instructions/guidelines-for-adapting-to-new-instrument.md', 'Instructions', 'Guidelines for using a Different Pressure Measurement System']
 
 
 copyright: Copyright &copy; 2015, <a href="https://twitter.com/_tomchristie">Josh Bradshaw</a>.

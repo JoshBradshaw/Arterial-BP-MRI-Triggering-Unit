@@ -10,6 +10,7 @@ import serial
 import serial.tools.list_ports
 import logging
 import logging.handlers
+from datetime import datetime
 
 TRIGGER_PULSE_CODE = 100000
 SIXTEEN_BIT_TO_COUNTS = 13107.2 # 2^16 counts / 5 V = 13107.2 counts / volt
@@ -115,6 +116,9 @@ class Teensy(object):
 
 
 class plotData(object):
+    """Updates the plot animations with the most recent sensor data, and 
+    rescales the axis as required.
+    """
     def __init__(self):
         self.select_speed()
         self.logging = gui.logDataButton.isChecked()
@@ -140,7 +144,7 @@ class plotData(object):
         else:
             self.ts[self.last_point] = 0
         # log the sample
-        logger.info("{} {}".format(self.ys[self.last_point], self.ts[self.last_point]))
+        logger.info("{}: {} {}".format(datetime.now().strftime('%Y-%m-%d-%H-%M-%f'), self.ys[self.last_point], self.ts[self.last_point]))
         # redraw the lines (note this is really inefficient, redrawing a dirty rectangle only would be much faster)
         bp_curve.setData(self.xs, self.ys)
         gui.bpPlot.replot() 

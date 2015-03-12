@@ -1,6 +1,6 @@
-# Real Time Gain Adjustment
+## Real Time Gain Adjustment
 
-## Algorithm Requirements
+### Algorithm Requirements
 
 1. Must not depend on the triggering algorithm working properly, because in the case of output saturation, or extremely low signal amplitude, triggering will not be functional.
 3. When gain adjustments are made, they must be gradual, to avoid creating spikes in the input signal.

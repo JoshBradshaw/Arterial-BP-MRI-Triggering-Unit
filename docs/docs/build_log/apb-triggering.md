@@ -1,8 +1,8 @@
-# Arterial Blood Pressure Pulse Filtering and Peak Detection
+## Arterial Blood Pressure Pulse Filtering and Peak Detection
 
 This post describes the algorithm used to detect the peaks of the arterial blood pressure pulses for triggering. The input to this algorithm is the sensor value of the blood pressure catheter, which is read by the analog to digital converter at a sampling rate of 250Hz. The output of this algorithm is a TTL pulse function, which triggers the MRI machine every time a unique heartbeat is detected.
 
-## Algorithm Requirements:
+### Algorithm Requirements:
 
 The algorithm must:
 
@@ -12,7 +12,7 @@ The algorithm must:
 4. Must perform optimally at a sampling rate between 200Hz to 500Hz.
 5. Must work for pulse rates between 40 BPM to 300 BPM (a very reasonable range for humans and pigs, too low for use in mice).
 
-## Filtering
+### Filtering
 
 Below is an image of an idealized arterial blood pressure pulse:
 
@@ -36,7 +36,7 @@ This simple function is extremely useful for two reasons:
 1. It reduces the second peak of the waveform to a negligible amplitude.
 2. It's based only on slope, not absolute magnitudes, so it establishes a consistent baseline in the data, removing any DC drift.
 
-## Peak Detection
+### Peak Detection
 
 A variety of peak detection algorithms were tested for this purpose. The best performing algorithm is a simple state machine with the following states:
 

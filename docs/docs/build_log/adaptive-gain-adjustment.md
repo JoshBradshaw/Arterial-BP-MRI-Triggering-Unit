@@ -1,4 +1,4 @@
-# Variable Gain Amplifier with SPI Interface
+## Variable Gain Amplifier with SPI Interface
 
 A major problem with triggering off of the fetal blood pressures is that the signal coming from the transducers is relatively small compared to the full scale of the pressure measurement instrument (numbers given below in specifications). To resolve this issue, I considered three possible solutions:
 
@@ -8,7 +8,7 @@ A major problem with triggering off of the fetal blood pressures is that the sig
 
 After due consideration, I opted to use strategy #3. Having the microcontroller perform the adjustment is advantageous because the microntroller can adjust the gain smoothly and gradually over a period of one minute or more, which will ensure that the gain adjustments do not interfere with the constantly running triggering algorithm.
 
-## Specifications
+### Specifications
 
 * The Samba Sensor can measure pressures from -38 mmHg to 263 mmHg, which is linearly mapped to a 0-5V output
 * Fetal lambs have a typical blood pressure of 70/30 mmHg, which is the best approximation we have for a fetal Yorkshire pig
@@ -17,7 +17,7 @@ With the assumed blood pressure range of the pig, only 0.66V of the 5V range wil
 
 Based on these estimates I calculated the minimum possible gain range to be 1x - 8x. I choose to use an upper gain value of 11x in my design, so that it will work optimally even with lower than expected blood pressures.
 
-## Building Blocks
+### Building Blocks
 
 I opted to use this whitepaper as the basis of my design: [CN0112: Variable Gain Noninverting Amplifier Using the AD5292 Digital Potentiometer and the OP184 Op Amp](http://www.analog.com/en/circuits-from-the-lab/cn0112/vc.html).
 

@@ -1,9 +1,9 @@
-# PCB Design
+## PCB Design
 
 I opted to design a simple PCB for this project, so that more versions of this triggering unit can be produced with minimal effort. 
 
 
-## Design Criteria
+### Design Criteria
 
 1. Analog ground plane must be completely separated from the digital groundplane to avoid crosstalk on the sensitive op-amp circuits.
 2. Must use 10/10 thou minimum trace width and clearance, so that this board can easily be manufactured by anyone.
@@ -14,25 +14,25 @@ For anyone wishing to build this board, some moderate to advanced soldering is r
 
 The Teensy eagle CAD library used in this design is available at the [PJRC website](https://www.pjrc.com/teensy/eagle_lib.html). 
 
-## PCB Manufacture
+### PCB Manufacture
 
 For PCB prototyping, I went with [APcircuits](http://apcircuits.com/). 
 
-## Design:
+### Design:
 
 ![alt text](/images/pcb_layout.png "Circuit board layout")
 
-## Bare Board:
+### Bare Board:
 
 ![alt text](/images/bare_board.JPG "Circuit board layout")
 
-## Assembled Board:
+### Assembled Board:
 
 ![alt text](/images/assembled_board.JPG "Circuit board layout")
 
-## Things to fix in subsequent revisions
+### Things to fix in subsequent revisions
 
 1. One sub-optimal choice I made in the design process of this PCB was the decision to use a 6 channel digital potentiometer, when I'm currently only using two channels. I chose that part simply because I did the breadboard verion with a six channel pot, and because digikey didn't have the 2 or 4 channel version of the part in stock while I was putting the prototype together.
 
-## Related Questions and Uncertainty
+### Related Questions and Uncertainty
 1. How much electromagnetic inferferance from the MRI machine will the instruments be exposed to when they're sitting in the control room of the 3T scanner, assuming that we scan with the door closed and the waveguide plugged with a conductive blanket?
