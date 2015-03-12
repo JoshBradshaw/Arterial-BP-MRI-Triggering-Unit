@@ -1,4 +1,4 @@
-# System Overview
+## System Overview
 
 The Arterial Blood Pressure Triggering System is an open source tool developed at SickKids. The system converts a blood pressure signal into a TTL signal, as illustrated below.
 
@@ -6,7 +6,7 @@ The Arterial Blood Pressure Triggering System is an open source tool developed a
 
 This is useful for situations in which a triggering signal is required to correct for pulsatile flow or cardiac motion, but the standard clinical ECG or pulse oximeter based triggering systems can not be used. The original application of this system was to provide a retrospective gating signal during 4DFlow and phase contrast scans on prenatal Yorkshire pig fetus's hearts. During the experiments, the fetal pigs blood pressure was monitored using an invasive Samba flow probe in the carotid artery. TODO: INSERT SOME IMAGES
 
-## Key Features
+### Key Features
 
 * Compatible with [Transonic](http://www.transonic.com/products/research/product/t402t403-multi-channel-research-consoles/) and Samba Sensors pressure measurement modules, and can easily be adapted to work with most other pressure measurement instruments
 * Unit calibrates itself automatically every three seconds to correct for baseline drift, and large changes in maximum signal amplitude
@@ -15,7 +15,7 @@ This is useful for situations in which a triggering signal is required to correc
 * The triggering unit has voltage regulation circuitry complete with inline fuses, to ensure that the scanner will be protected in the event of an electrical fault in the computer or pressure measurement instrument
 * Simple monitoring software shows real-time plots of the blood pressure and triggering waveforms, and logs that data so that it can be compared against the scan data in post processing
 
-## Hardware
+### Hardware
 
 The triggering unit is shown below:
 
@@ -45,11 +45,11 @@ The monitoring software is not required to use the triggering unit, but it is ve
 For more information about the monitoring software see:
 1. Monitoring software design
 
-## Scanner compatibility
+### Scanner compatibility
 
 The SickKids research MRI scanner is the Siemens Magnetom Trio with a field strength of 3T, so the triggering unit's TTL output is calibrated to meet or exceed all of the parameters given in Siemen's timing diagram (taken from the latest version of the Magnetom Trio operating manual). The TTL pulses sent by the unit are 20ms in duration at 3.3V, which should be sufficient for most MRI scanners.
 
-## How to aquire a unit
+### How to aquire a unit
 
 So far only two of these units have been built, and they were both hand assembled. If you're moderately competant with software and electronics you can build one yourself using the schematics and this tutuorial.
 
