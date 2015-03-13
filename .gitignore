@@ -8,6 +8,10 @@
 .log
 logs/
 
+#py2exe build
+build/
+dist/
+
 # docs site
 site/
 

@@ -18,6 +18,8 @@ The Teensy eagle CAD library used in this design is available at the [PJRC websi
 
 For PCB prototyping, I went with [APcircuits](http://apcircuits.com/). 
 
+Getting one of these boards manufactured is as simple as uploading the GERBER files (included in the git repository) to a manufacturer's website.
+
 ### Design:
 
 ![alt text](/images/pcb_layout.png "Circuit board layout")
