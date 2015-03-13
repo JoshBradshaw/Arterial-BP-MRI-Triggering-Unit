@@ -34,12 +34,28 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="../.." class="icon icon-home"> Arterial BP Triggering</a>
+        <a href="../../instructions/user_manual" class="icon icon-home"> Arterial BP Triggering</a>
         
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
       <ul class="current">
+    
+        
+        <span>Instructions</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../instructions/user_manual">User Manual</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../instructions/guidelines-for-adapting-to-new-instrument">Guidelines for using a Different Pressure Measurement System</a>
+                    
+                </li>
+            
+        
+
     
         
         <span>Build Log</span>
@@ -54,9 +70,25 @@
                     
                         <ul>
                         
-                            <li class="toctree-l2"><a href="#real-time-gain-adjustment">Real Time Gain Adjustment</a></li>
+                            <li class="toctree-l2"><a href="#algorithm-for-adjusting-signal-gain-in-real-time">Algorithm for Adjusting Signal Gain in Real Time</a></li>
                             
                                 <li><a class="toctree-l3" href="#algorithm-requirements">Algorithm Requirements</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#attempt-1-simplest-possible-algorithm">Attempt 1: Simplest Possible Algorithm</a></li>
+                            
+                                <li><a class="toctree-l3" href="#attempt-2">Attempt 2</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#testing">Testing</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#remaining-issues">Remaining Issues</a></li>
+                            
+                                <li><a class="toctree-l3" href="#attempt-3">Attempt 3</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#related-questions-and-uncertainty">Related Questions and Uncertainty</a></li>
                             
                         
                         </ul>
@@ -86,22 +118,6 @@
         
 
     
-        
-        <span>Instructions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../../instructions/user_manual">User Manual</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../../instructions/guidelines-for-adapting-to-new-instrument">Guidelines for using a Different Pressure Measurement System</a>
-                    
-                </li>
-            
-        
-
-    
 </ul>
 
       </div>
@@ -113,7 +129,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href="../.."></a>
+        <a href="../../instructions/user_manual"></a>
       </nav>
 
       
@@ -121,7 +137,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../..">Docs</a> &raquo;</li>
+    <li><a href="../../instructions/user_manual">Docs</a> &raquo;</li>
     <li>Gain Adjustment Algorithm</li>
       <li class="wy-breadcrumbs-aside">
         
@@ -135,13 +151,246 @@
 </div>
           <div role="main">
             <div class="section">
-              <h2 id="real-time-gain-adjustment">Real Time Gain Adjustment</h2>
+              <h2 id="algorithm-for-adjusting-signal-gain-in-real-time">Algorithm for Adjusting Signal Gain in Real Time</h2>
+<p>The motivation for this algorithm is described in the document: Variable Gain Amplifier with SPI Interface</p>
 <h3 id="algorithm-requirements">Algorithm Requirements</h3>
 <ol>
 <li>Must not depend on the triggering algorithm working properly, because in the case of output saturation, or extremely low signal amplitude, triggering will not be functional.</li>
 <li>When gain adjustments are made, they must be gradual, to avoid creating spikes in the input signal.</li>
 <li>Changes to signal gain must be gradual, to avoid over-correcting for the insignificant amplitude spikes that occasionally occur when the pressure catheter tip comes into contact with the vessel wall. </li>
 <li>In steady state, the signal must have some headroom to avoid output saturation if the baseline drifts, or the signal magnitude increases.</li>
+</ol>
+<p>Note: The instrument used for this study provides a minimum voltage of 0V and performs offset correction automatically, so offset correction is not addressed here.</p>
+<h2 id="attempt-1-simplest-possible-algorithm">Attempt 1: Simplest Possible Algorithm</h2>
+<p>This algorithm is based on how a person would manually set the gain level. Starting from a low gain level, the gain is slowly increased until it reaches a set ampliftude threshold.</p>
+<ul>
+<li>Amplifier starts at unity gain, to ensure that even a maximum amplitude will not clip at t = 0</li>
+<li>In three second windows, we check whether or not the signal amplitude has reached the threshold value</li>
+</ul>
+<p>Algorithm code:</p>
+<p>A summarized version of the implementation is given here <a href="https://gist.github.com/JoshBradshaw/2dee769803f95edf20b8">Full Code Here</a>:</p>
+<p>{% highlight c %}
+volatile int potentiometer_code = 0; // range 0-256 where 0 -&gt; ~84 Ohm and 256 -&gt; ~50 KOhm
+const int MAX_SIGNAL_AMPLITUDE = 28900;
+const int CORRECTION = 10; // number of potentiomter codes to correct by if signal is out of range
+volatile bool threshold_achieved = false;
+volatile int WAITING_PERIOD = 30;
+volatile int waiting_count = 0;
+volatile const int SAMBA_GAIN_POT = 2;</p>
+<p>void sample() {
+  int val = analogRead(14);
+  //Serial.printf("sample taken, value: %d \n", val);</p>
+<p>if (val &gt; MAX_SIGNAL_AMPLITUDE) {
+    threshold_achieved = true;
+    change_pot_code(LOW);
+    Serial.printf("threshold reached, new pot code: %d \n", potentiometer_code);
+  } </p>
+<p>if (waiting_count &gt;= WAITING_PERIOD &amp;&amp; !threshold_achieved) {
+    waiting_count = 0;
+    change_pot_code(HIGH);
+    Serial.printf("threshold not yet reached, new pot code: %d \n", potentiometer_code);
+  }
+  waiting_count++;
+}</p>
+<p>void change_pot_code(const bool increase) {
+  // change the potentiometer code if the new code fits in 0 - 256 range</p>
+<p>if (increase &amp;&amp; potentiometer_code &lt; 256 - CORRECTION) {
+    potentiometer_code += CORRECTION;
+    digitalPotWrite(SAMBA_GAIN_POT, potentiometer_code);
+  }
+  if (!increase &amp;&amp; potentiometer_code - CORRECTION &gt; 0 + CORRECTION) {
+    potentiometer_code -= CORRECTION;
+    digitalPotWrite(SAMBA_GAIN_POT, potentiometer_code);
+  }
+}
+{% endhighlight %}</p>
+<p>For such a simple algorithm this actually works surprisingly well. There are a few potential problems though:</p>
+<p>Ignored cases and problems to fix:
+1. Signals that start off with high amplitude, then gradually lose amplitude will never be corrected.
+2. A signals with noise content that produces large, instantaneous amplitude spikes.
+3. The sudden amplitude changes brought about by shifting the potentiometer code by 10 counts could interfere with the peak detection and filtering algorithms if they occur at an inopportune time.
+4. There is no margin of acceptable values above the threshold in this algorithm.</p>
+<h3 id="attempt-2">Attempt 2</h3>
+<p>To address issues 1-3 I made the following modifications to the algorithm</p>
+<ul>
+<li>Replaced single threshold with three thresholds: minimum, target and maximum</li>
+<li>If the signal's amplitude drops below minium, or exceeds maximum the amplitude is changed until it reaches target</li>
+<li>The thresholds are checked over a 5s interval.</li>
+</ul>
+<p>The advantage of this approach is that the signal's amplitude can fluctuate within a ~4V range without crossing the maximum or minimum threshold. When the signal does cross the threshold, the algorithm attempts to center it within the min-max range. This ensures that gain correction will only be triggered when there is a significant change in input signal amplitude, and provided that the signal is in a steady state, corrections should last a long time.</p>
+<p>The code for the modified algorithm is given below <a href="https://gist.github.com/JoshBradshaw/d48509c063174f4c5d18">full code here</a>:</p>
+<p>{% highlight c %}
+// for the purposes of this algorithm LOW -&gt; lower gain HIGH -&gt; raise gain</p>
+<p>void adjust_gain(const int sensor_value) {
+  if (sensor_value &gt; MIN_SIGNAL_AMPLITUDE) {
+    minExceeded = true;
+  } 
+  if (sensor_value &gt; MAX_SIGNAL_AMPLITUDE) {
+    maxExceeded = true;
+  }
+  if (sensor_value &gt; TARGET_AMPLITUDE) {
+    targetExceeded = true;
+  }</p>
+<p>// every 5 seconds check the amplitude levels
+  if (windowCount &gt; WINDOW_PERIOD) {
+    // check if min or max have been violated
+    if (!minExceeded) {
+      seekState = 1;
+    }
+    if (maxExceeded) {
+      seekState = 2;
+    }</p>
+<pre><code>// if unit was increasing gain, check if threshold reached
+if (seekState == 1) {
+  if (targetExceeded) {
+    seekState = 0;
+  }
+  else {
+    changeGain(SAMBA_GAIN_POT, HIGH);
+  }
+}
+// if unit was decreasing gain, check if threshold reached
+if (seekState == 2) {
+  if (!targetExceeded) {
+    seekState = 0;
+  } else {
+    changeGain(SAMBA_GAIN_POT, LOW);
+  }
+}
+
+Serial.printf("state: %d, minExceeded: %d, targetExceeded: %d, maxExceeded: %d,  pot value: %d \n", seekState, minExceeded, targetExceeded, maxExceeded, potentiometerValue);
+
+// reset state
+minExceeded = false;
+targetExceeded = false;
+maxExceeded = false;
+windowCount = 0;
+</code></pre>
+<p>}
+  windowCount++;
+}
+{% endhighlight %}</p>
+<h2 id="testing">Testing</h2>
+<p>So far the testing on this algorithm has been pretty light. I connected the teensy board to an arbitrary funciton generator and decreased the amplitude until it dropped below the minimum threshold. The Teensy's debug output was:</p>
+<pre><code>state: 1, min_exceeded: 0, target_exceeded: 0, max_exceeded: 0,  pot value: 20 
+state: 1, min_exceeded: 0, target_exceeded: 0, max_exceeded: 0,  pot value: 30 
+state: 1, min_exceeded: 0, target_exceeded: 0, max_exceeded: 0,  pot value: 40 
+state: 1, min_exceeded: 0, target_exceeded: 0, max_exceeded: 0,  pot value: 50 
+state: 1, min_exceeded: 0, target_exceeded: 0, max_exceeded: 0,  pot value: 60 
+state: 1, min_exceeded: 0, target_exceeded: 0, max_exceeded: 0,  pot value: 70 
+state: 1, min_exceeded: 1, target_exceeded: 0, max_exceeded: 0,  pot value: 80 
+state: 1, min_exceeded: 1, target_exceeded: 0, max_exceeded: 0,  pot value: 90 
+state: 1, min_exceeded: 1, target_exceeded: 0, max_exceeded: 0,  pot value: 100 
+state: 1, min_exceeded: 1, target_exceeded: 0, max_exceeded: 0,  pot value: 110 
+state: 1, min_exceeded: 1, target_exceeded: 0, max_exceeded: 0,  pot value: 120 
+state: 1, min_exceeded: 1, target_exceeded: 0, max_exceeded: 0,  pot value: 130 
+state: 1, min_exceeded: 1, target_exceeded: 0, max_exceeded: 0,  pot value: 140 
+state: 0, min_exceeded: 1, target_exceeded: 1, max_exceeded: 0,  pot value: 140 
+state: 0, min_exceeded: 1, target_exceeded: 1, max_exceeded: 0,  pot value: 140 
+state: 0, min_exceeded: 1, target_exceeded: 1, max_exceeded: 0,  pot value: 140
+INFINITE REPEAT
+</code></pre>
+<p>On the rolling oscilloscope I had running I watched the maximum signal amplitude increase from 0.6V to 3.2V. This was a successful test.</p>
+<p>During the same run of the device, I increased the output of the funciton generator until it exceeded the upper threshold (I set the function generator to 4.8V).</p>
+<pre><code>state: 2, min_exceeded: 1, target_exceeded: 1, max_exceeded: 1,  pot value: 70 
+state: 2, min_exceeded: 1, target_exceeded: 1, max_exceeded: 0,  pot value: 60 
+state: 2, min_exceeded: 1, target_exceeded: 1, max_exceeded: 0,  pot value: 50 
+state: 2, min_exceeded: 1, target_exceeded: 1, max_exceeded: 0,  pot value: 40 
+state: 2, min_exceeded: 1, target_exceeded: 1, max_exceeded: 0,  pot value: 30 
+state: 0, min_exceeded: 1, target_exceeded: 0, max_exceeded: 0,  pot value: 30 
+state: 0, min_exceeded: 1, target_exceeded: 0, max_exceeded: 0,  pot value: 30 
+state: 0, min_exceeded: 1, target_exceeded: 0, max_exceeded: 0,  pot value: 30 
+state: 0, min_exceeded: 1, target_exceeded: 0, max_exceeded: 0,  pot value: 30 
+state: 0, min_exceeded: 1, target_exceeded: 0, max_exceeded: 0,  pot value: 30 
+state: 0, min_exceeded: 1, target_exceeded: 0, max_exceeded: 0,  pot value: 30 
+state: 0, min_exceeded: 1, target_exceeded: 0, max_exceeded: 0,  pot value: 30
+</code></pre>
+<p>Once again the Teensy centered the signal on the target threshold as expected.</p>
+<h2 id="remaining-issues">Remaining Issues</h2>
+<ol>
+<li>The algorithm's centering functionality depends on the signal being relatively consistent in magnitude from beat to beat. The consequences of this assumption need to be tested using real blood pressure waveforms taken from humans and animals.</li>
+<li>Changes in gain are still perform in 10 count leaps which cause signal distortion. To fix this I have two options:
+--<em> Time the changes in amplitude such that they will not interfere with peak detection.
+--</em> Change the gain gradually in increments of 1 count.
+I've opted not to tackle this in this version of the algorithm, because the testing the output waveform will require a better oscilliscope than I currently have available.</li>
+</ol>
+<h3 id="attempt-3">Attempt 3</h3>
+<p>I modified the algorithm to perform changes in gain gradually. I tested this algorithm with the high resolution oscilloscope at the Toronto Center for Phenogenetics, and I'm very confident that the gain adjustment is sufficiently smooth to avoid disrupting the triggering algorithm.</p>
+<p>{% highlight c %}
+void adjustGain(const int sensor_value) {
+    // seek state 0 = equilibrium
+    // seek state 1 = increasing gain to meet threshold
+    // seek state 2 = decreasing gain to meet threshold
+    // starts in increasing state to ensure that the signal is amplified to an optimal level at startup
+    volatile int seekState = 1;</p>
+<pre><code>// adjust potentiometer value if required (done in steps of 1 count for smoothness)
+
+// increase the pot value by one count
+if (potentiometerValue &lt; targetPotentiometerValue) {
+    potentiometerValue += 1;
+    digitalPotWrite(GAIN_POT, potentiometerValue);
+}
+// decrease the pot value by one count
+if (potentiometerValue &gt; targetPotentiometerValue) {
+    potentiometerValue -= 1;
+    digitalPotWrite(GAIN_POT, potentiometerValue);
+}
+
+// check if this sample is out of bounds
+if (sensor_value &gt; MIN_SIGNAL_AMPLITUDE) {
+    minExceeded = true;
+}
+if (sensor_value &gt; MAX_SIGNAL_AMPLITUDE) {
+    maxExceeded = true;
+}
+if (sensor_value &gt; TARGET_AMPLITUDE) {
+    targetExceeded = true;
+}
+// this section runs every 5 seconds
+// checks if gain needs to be adjusted, and sets the new gain value if required
+if (windowCount &gt; WINDOW_PERIOD) {
+    // check if min or max have been violated
+    if (!minExceeded) {
+        seekState = 1;
+    }
+    if (maxExceeded) {
+        seekState = 2;
+    }
+    // if unit was increasing gain, check if the threshold magnitude was reached
+    if (seekState == 1) {
+        if (targetExceeded) {
+            seekState = 0;
+        } else if (potentiometerValue &lt;= 256 - CORRECTION) {
+            targetPotentiometerValue += CORRECTION;
+        }
+        else {
+            return;
+        }
+    }
+    // if unit was decreasing gain, check if threshold reached
+    if (seekState == 2) {
+        if (!targetExceeded) {
+            seekState = 0;
+        } else if (potentiometerValue &gt; 0 + CORRECTION) {
+            targetPotentiometerValue -= CORRECTION;
+        } else {
+            return;
+        }
+    }
+    // reset state
+    minExceeded = false;
+    targetExceeded = false;
+    maxExceeded = false;
+    windowCount = 0;
+}
+windowCount++;
+</code></pre>
+<p>}
+{% endhighlight %}</p>
+<h2 id="related-questions-and-uncertainty">Related Questions and Uncertainty</h2>
+<ol>
+<li>What will a fetal pig's blood pressure be in uturo? Current estimate is 70/30 mmHg based on measurements taken by an Australian research group.</li>
+<li>If we switch to using a Transonic unit, what is the Transonic units reference pressure? Can it be zeroed? Will the module ever use the negative portion of the -5V to 5V analog output range if we zero the unit at ambient atmospheric pressure?</li>
 </ol>
 
             </div>
