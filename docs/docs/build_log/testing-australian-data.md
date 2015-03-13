@@ -10,4 +10,16 @@ Test results:
 
 Data File 1:
 
-Here's a zoomed in snapshot of how the tr
+Here's a zoomed in snapshot of the triggering system operating on a fetal lamb:
+
+![alt text](/images/test_1.png "image of an arterial blood pressure pulse with its corresponding trigger signal below")
+
+Here's a section of the fetal lamb's blood pressure trace that has a skip beat, which are common in both lambs and pigs:
+
+![alt text](/images/test_2.png "image of an arterial blood pressure pulse with its corresponding trigger signal below")
+
+This zoomed out view shows the 30s pulse waveform
+
+![alt text](/images/test_3.png "image of an arterial blood pressure pulse with its corresponding trigger signal below")
+
+I ran tests like these on a variety of different pulse pressure waveforms, on lamb data, human data, pulse oximeter recordings of my own heart, and simulated arterial blood pressure pulses that I generated using an arbitrary function generator. The pressure trigger unit performed excellently with all of the little variations in waveform shape, magnitude, offset drift and frequencies. I'm very content with the results.
