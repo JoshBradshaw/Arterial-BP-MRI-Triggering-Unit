@@ -54,13 +54,19 @@ trigger_curve.setPen(Qt.QPen(Qt.Qt.green))
 
 # if its a windows 7 machine clean up the blinkyness by running anti aliasing
 # if its a windows xp or mac, do not run anti aliasing because it will lag
+# if its a osx or linux box this call will not work
+anti_alias = False
 try:
-    major_verion = sys.getwindowsversion()
+    major_verion = sys.getwindowsversion().major
     if major_verion >= 6:
-        trigger_curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased) # prettier, but laggy on slow computers
-        bp_curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased) # prettier, but laggy on slow computers
+        anti_alias = True
 except:
     pass
+
+if anti_alias:
+    trigger_curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased) # prettier, but laggy on slow computers
+    bp_curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased) # prettier, but laggy on slow computers
+
 
 log_dir = "logs"
 if not os.path.exists(log_dir):

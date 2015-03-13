@@ -11,6 +11,7 @@ logs/
 #py2exe build
 build/
 dist/
+bin/
 
 # docs site
 site/

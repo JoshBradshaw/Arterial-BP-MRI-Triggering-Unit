@@ -10,5 +10,5 @@ DATA=[('imageformats',['C:\\Python27/Lib/site-packages/PyQt4/plugins/imageformat
     ])]
 
 setup(console=['realtimePlot.py'], 
-	options={"py2exe":{"includes":["sip", "PyQt4.QtSvg"]}},
+	options={"py2exe":{'bundle_files': 1, 'compressed': True, "includes":["sip", "PyQt4.QtSvg"]}},
 	data_files=DATA)

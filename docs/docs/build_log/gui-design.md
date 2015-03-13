@@ -7,3 +7,14 @@ The blood pressure triggering device needs to have an interface so that the rese
  Here's an image of the finished monitoring tool in action.
 
  ![alt text](/images/monitoring_system.png "Monitoring System")
+
+### Setup
+
+There are two ways to run the monitoring tool:
+
+1. On windows you can run the pre-build exectutable: [monitoring_tool_win32_v1.0.zip](https://drive.google.com/file/d/0B9S2t7PTl3ecMmdWTXpJbzJ3Z1E/view?usp=sharing)
+
+2. If that executable doesn't work, the full development environment I build this with can easily be installed. Just download [PythonXY](https://code.google.com/p/pythonxy/), download the the [source code](https://github.com/JoshBradshaw/Arterial-BP-MRI-Triggering-Unit/), navigate to the monitoring_tool directory in terminal and run the program with 
+{% highlight powershell %}
+$ python realtimePlot.py
+{% endhighlight %}
