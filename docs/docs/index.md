@@ -4,7 +4,7 @@ The Arterial Blood Pressure Triggering System is an open source tool developed a
 
 ![alt text](/images/bp_vs_ttl.jpg "illustration of how the triggering system transforms blood pressure signal into TTL signal")
 
-This is useful for situations in which a triggering signal is required to correct for pulsatile flow or cardiac motion, but the standard clinical ECG or pulse oximeter based triggering systems can not be used. The original application of this system was to provide a retrospective gating signal during 4DFlow and phase contrast scans on prenatal Yorkshire pig fetus's hearts. During the experiments, the fetal pigs blood pressure was monitored using an invasive Samba flow probe in the carotid artery. TODO: INSERT SOME IMAGES
+This is useful for situations in which a gating signal is required to correct for pulsatile flow or cardiac motion, but the standard clinical ECG or pulse oximeter based triggering systems can not be used. The original application of this system was to provide a retrospective gating signal during 4DFlow and phase contrast scans on prenatal Yorkshire pig fetus's hearts. During the experiments, the fetal pigs blood pressure was monitored using an invasive Samba flow probe in the carotid artery.
 
 ### Key Features
 
@@ -23,24 +23,18 @@ The triggering unit is shown below:
 
 The connections on the front panel of the triggering unit are:
 
+
 Samba Sensor Input (s-video)|Transonic Sensor Input (BNC) |External Trigger Out (RCA) 
 ----------------------------|-----------------------------|--------------------------
 Input Selection Switch      |                             |Trigger Status LED
 
 Finally, a USB cable runs out of the back corner of the unit. This cable is connected to a computer to power the unit, and optionally to transfer the blood pressure readings to the monitoring software.
 
-For more information about the hardware design see:
-
-1. Circuit design TODO: finish writing page
-2. PCB Design TODO: finish writing page
-3. Assembly
-4. Triggering algorithm design
-
 ## Monitoring Software
 
 ![alt text](/images/monitoring_system.png "triggering unit photo")
 
-The monitoring software is not required to use the triggering unit, but it is very useful. The top chart animation shows the input signal from the pressure catheter, and the bottom chart animation shows the triggering signal that's been sent to the scanner. These charts are updated in real-time with <20ms of delay, so you'll be aware of any irregular heartbeats, or problems with the pressure catheter, right as they happen. Every run of the triggering unit is logged with time and date stamps, so it can be compared with the MRI data in post processing if required.
+The monitoring tool give the experimenter real feedback on the pressure catheter and the triggering signal. The top chart animation shows the input signal from the pressure catheter, and the bottom chart animation shows the triggering signal that's been sent to the scanner. These charts are updated in real-time with <20ms of delay, so you'll be aware of any irregular heartbeats, or problems with the pressure catheter, right as they happen. Every run of the triggering unit is logged with time and date stamps, so it can be compared with the MRI data in post processing if required.
 
 For more information about the monitoring software see:
 1. Monitoring software design

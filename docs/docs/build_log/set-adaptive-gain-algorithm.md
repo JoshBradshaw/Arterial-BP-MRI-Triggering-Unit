@@ -23,47 +23,45 @@ Algorithm code:
 
 A summarized version of the implementation is given here [Full Code Here](https://gist.github.com/JoshBradshaw/2dee769803f95edf20b8):
 
+    volatile int potentiometer_code = 0; // range 0-256 where 0 -> ~84 Ohm and 256 -> ~50 KOhm
+    const int MAX_SIGNAL_AMPLITUDE = 28900;
+    const int CORRECTION = 10; // number of potentiomter codes to correct by if signal is out of range
+    volatile bool threshold_achieved = false;
+    volatile int WAITING_PERIOD = 30;
+    volatile int waiting_count = 0;
+    volatile const int SAMBA_GAIN_POT = 2;
 
-{% highlight c %}
-volatile int potentiometer_code = 0; // range 0-256 where 0 -> ~84 Ohm and 256 -> ~50 KOhm
-const int MAX_SIGNAL_AMPLITUDE = 28900;
-const int CORRECTION = 10; // number of potentiomter codes to correct by if signal is out of range
-volatile bool threshold_achieved = false;
-volatile int WAITING_PERIOD = 30;
-volatile int waiting_count = 0;
-volatile const int SAMBA_GAIN_POT = 2;
+    void sample() {
+      int val = analogRead(14);
+      //Serial.printf("sample taken, value: %d \n", val);
+      
+      if (val > MAX_SIGNAL_AMPLITUDE) {
+        threshold_achieved = true;
+        change_pot_code(LOW);
+        Serial.printf("threshold reached, new pot code: %d \n", potentiometer_code);
+      } 
+      
+      if (waiting_count >= WAITING_PERIOD && !threshold_achieved) {
+        waiting_count = 0;
+        change_pot_code(HIGH);
+        Serial.printf("threshold not yet reached, new pot code: %d \n", potentiometer_code);
+      }
+      waiting_count++;
+    }
 
-void sample() {
-  int val = analogRead(14);
-  //Serial.printf("sample taken, value: %d \n", val);
-  
-  if (val > MAX_SIGNAL_AMPLITUDE) {
-    threshold_achieved = true;
-    change_pot_code(LOW);
-    Serial.printf("threshold reached, new pot code: %d \n", potentiometer_code);
-  } 
-  
-  if (waiting_count >= WAITING_PERIOD && !threshold_achieved) {
-    waiting_count = 0;
-    change_pot_code(HIGH);
-    Serial.printf("threshold not yet reached, new pot code: %d \n", potentiometer_code);
-  }
-  waiting_count++;
-}
+    void change_pot_code(const bool increase) {
+      // change the potentiometer code if the new code fits in 0 - 256 range
+      
+      if (increase && potentiometer_code < 256 - CORRECTION) {
+        potentiometer_code += CORRECTION;
+        digitalPotWrite(SAMBA_GAIN_POT, potentiometer_code);
+      }
+      if (!increase && potentiometer_code - CORRECTION > 0 + CORRECTION) {
+        potentiometer_code -= CORRECTION;
+        digitalPotWrite(SAMBA_GAIN_POT, potentiometer_code);
+      }
+    }
 
-void change_pot_code(const bool increase) {
-  // change the potentiometer code if the new code fits in 0 - 256 range
-  
-  if (increase && potentiometer_code < 256 - CORRECTION) {
-    potentiometer_code += CORRECTION;
-    digitalPotWrite(SAMBA_GAIN_POT, potentiometer_code);
-  }
-  if (!increase && potentiometer_code - CORRECTION > 0 + CORRECTION) {
-    potentiometer_code -= CORRECTION;
-    digitalPotWrite(SAMBA_GAIN_POT, potentiometer_code);
-  }
-}
-{% endhighlight %}
 
 
 For such a simple algorithm this actually works surprisingly well. There are a few potential problems though:
@@ -86,59 +84,59 @@ The advantage of this approach is that the signal's amplitude can fluctuate with
 
 The code for the modified algorithm is given below [full code here](https://gist.github.com/JoshBradshaw/d48509c063174f4c5d18):
     
-{% highlight c %}
-// for the purposes of this algorithm LOW -> lower gain HIGH -> raise gain
 
-void adjust_gain(const int sensor_value) {
-  if (sensor_value > MIN_SIGNAL_AMPLITUDE) {
-    minExceeded = true;
-  } 
-  if (sensor_value > MAX_SIGNAL_AMPLITUDE) {
-    maxExceeded = true;
-  }
-  if (sensor_value > TARGET_AMPLITUDE) {
-    targetExceeded = true;
-  }
-  
-  // every 5 seconds check the amplitude levels
-  if (windowCount > WINDOW_PERIOD) {
-    // check if min or max have been violated
-    if (!minExceeded) {
-      seekState = 1;
-    }
-    if (maxExceeded) {
-      seekState = 2;
-    }
+    // for the purposes of this algorithm LOW -> lower gain HIGH -> raise gain
+
+    void adjust_gain(const int sensor_value) {
+      if (sensor_value > MIN_SIGNAL_AMPLITUDE) {
+        minExceeded = true;
+      } 
+      if (sensor_value > MAX_SIGNAL_AMPLITUDE) {
+        maxExceeded = true;
+      }
+      if (sensor_value > TARGET_AMPLITUDE) {
+        targetExceeded = true;
+      }
       
-    // if unit was increasing gain, check if threshold reached
-    if (seekState == 1) {
-      if (targetExceeded) {
-        seekState = 0;
+      // every 5 seconds check the amplitude levels
+      if (windowCount > WINDOW_PERIOD) {
+        // check if min or max have been violated
+        if (!minExceeded) {
+          seekState = 1;
+        }
+        if (maxExceeded) {
+          seekState = 2;
+        }
+          
+        // if unit was increasing gain, check if threshold reached
+        if (seekState == 1) {
+          if (targetExceeded) {
+            seekState = 0;
+          }
+          else {
+            changeGain(SAMBA_GAIN_POT, HIGH);
+          }
+        }
+        // if unit was decreasing gain, check if threshold reached
+        if (seekState == 2) {
+          if (!targetExceeded) {
+            seekState = 0;
+          } else {
+            changeGain(SAMBA_GAIN_POT, LOW);
+          }
+        }
+        
+        Serial.printf("state: %d, minExceeded: %d, targetExceeded: %d, maxExceeded: %d,  pot value: %d \n", seekState, minExceeded, targetExceeded, maxExceeded, potentiometerValue);
+        
+        // reset state
+        minExceeded = false;
+        targetExceeded = false;
+        maxExceeded = false;
+        windowCount = 0;
       }
-      else {
-        changeGain(SAMBA_GAIN_POT, HIGH);
-      }
+      windowCount++;
     }
-    // if unit was decreasing gain, check if threshold reached
-    if (seekState == 2) {
-      if (!targetExceeded) {
-        seekState = 0;
-      } else {
-        changeGain(SAMBA_GAIN_POT, LOW);
-      }
-    }
-    
-    Serial.printf("state: %d, minExceeded: %d, targetExceeded: %d, maxExceeded: %d,  pot value: %d \n", seekState, minExceeded, targetExceeded, maxExceeded, potentiometerValue);
-    
-    // reset state
-    minExceeded = false;
-    targetExceeded = false;
-    maxExceeded = false;
-    windowCount = 0;
-  }
-  windowCount++;
-}
-{% endhighlight %}
+
 
 ## Testing
 
@@ -193,77 +191,77 @@ I've opted not to tackle this in this version of the algorithm, because the test
 
 I modified the algorithm to perform changes in gain gradually. I tested this algorithm with the high resolution oscilloscope at the Toronto Center for Phenogenetics, and I'm very confident that the gain adjustment is sufficiently smooth to avoid disrupting the triggering algorithm.
 
-{% highlight c %}
-void adjustGain(const int sensor_value) {
-    // seek state 0 = equilibrium
-    // seek state 1 = increasing gain to meet threshold
-    // seek state 2 = decreasing gain to meet threshold
-    // starts in increasing state to ensure that the signal is amplified to an optimal level at startup
-    volatile int seekState = 1;
 
-    // adjust potentiometer value if required (done in steps of 1 count for smoothness)
+    void adjustGain(const int sensor_value) {
+        // seek state 0 = equilibrium
+        // seek state 1 = increasing gain to meet threshold
+        // seek state 2 = decreasing gain to meet threshold
+        // starts in increasing state to ensure that the signal is amplified to an optimal level at startup
+        volatile int seekState = 1;
 
-    // increase the pot value by one count
-    if (potentiometerValue < targetPotentiometerValue) {
-        potentiometerValue += 1;
-        digitalPotWrite(GAIN_POT, potentiometerValue);
-    }
-    // decrease the pot value by one count
-    if (potentiometerValue > targetPotentiometerValue) {
-        potentiometerValue -= 1;
-        digitalPotWrite(GAIN_POT, potentiometerValue);
+        // adjust potentiometer value if required (done in steps of 1 count for smoothness)
+
+        // increase the pot value by one count
+        if (potentiometerValue < targetPotentiometerValue) {
+            potentiometerValue += 1;
+            digitalPotWrite(GAIN_POT, potentiometerValue);
+        }
+        // decrease the pot value by one count
+        if (potentiometerValue > targetPotentiometerValue) {
+            potentiometerValue -= 1;
+            digitalPotWrite(GAIN_POT, potentiometerValue);
+        }
+
+        // check if this sample is out of bounds
+        if (sensor_value > MIN_SIGNAL_AMPLITUDE) {
+            minExceeded = true;
+        }
+        if (sensor_value > MAX_SIGNAL_AMPLITUDE) {
+            maxExceeded = true;
+        }
+        if (sensor_value > TARGET_AMPLITUDE) {
+            targetExceeded = true;
+        }
+        // this section runs every 5 seconds
+        // checks if gain needs to be adjusted, and sets the new gain value if required
+        if (windowCount > WINDOW_PERIOD) {
+            // check if min or max have been violated
+            if (!minExceeded) {
+                seekState = 1;
+            }
+            if (maxExceeded) {
+                seekState = 2;
+            }
+            // if unit was increasing gain, check if the threshold magnitude was reached
+            if (seekState == 1) {
+                if (targetExceeded) {
+                    seekState = 0;
+                } else if (potentiometerValue <= 256 - CORRECTION) {
+                    targetPotentiometerValue += CORRECTION;
+                }
+                else {
+                    return;
+                }
+            }
+            // if unit was decreasing gain, check if threshold reached
+            if (seekState == 2) {
+                if (!targetExceeded) {
+                    seekState = 0;
+                } else if (potentiometerValue > 0 + CORRECTION) {
+                    targetPotentiometerValue -= CORRECTION;
+                } else {
+                    return;
+                }
+            }
+            // reset state
+            minExceeded = false;
+            targetExceeded = false;
+            maxExceeded = false;
+            windowCount = 0;
+        }
+        windowCount++;
     }
 
-    // check if this sample is out of bounds
-    if (sensor_value > MIN_SIGNAL_AMPLITUDE) {
-        minExceeded = true;
-    }
-    if (sensor_value > MAX_SIGNAL_AMPLITUDE) {
-        maxExceeded = true;
-    }
-    if (sensor_value > TARGET_AMPLITUDE) {
-        targetExceeded = true;
-    }
-    // this section runs every 5 seconds
-    // checks if gain needs to be adjusted, and sets the new gain value if required
-    if (windowCount > WINDOW_PERIOD) {
-        // check if min or max have been violated
-        if (!minExceeded) {
-            seekState = 1;
-        }
-        if (maxExceeded) {
-            seekState = 2;
-        }
-        // if unit was increasing gain, check if the threshold magnitude was reached
-        if (seekState == 1) {
-            if (targetExceeded) {
-                seekState = 0;
-            } else if (potentiometerValue <= 256 - CORRECTION) {
-                targetPotentiometerValue += CORRECTION;
-            }
-            else {
-                return;
-            }
-        }
-        // if unit was decreasing gain, check if threshold reached
-        if (seekState == 2) {
-            if (!targetExceeded) {
-                seekState = 0;
-            } else if (potentiometerValue > 0 + CORRECTION) {
-                targetPotentiometerValue -= CORRECTION;
-            } else {
-                return;
-            }
-        }
-        // reset state
-        minExceeded = false;
-        targetExceeded = false;
-        maxExceeded = false;
-        windowCount = 0;
-    }
-    windowCount++;
-}
-{% endhighlight %}
 
 ## Related Questions and Uncertainty
 1. What will a fetal pig's blood pressure be in uturo? Current estimate is 70/30 mmHg based on measurements taken by an Australian research group.

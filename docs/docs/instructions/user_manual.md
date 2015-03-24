@@ -12,6 +12,10 @@ To use it safely:
 4. At this point you can either use the BNC -> S-video adapter that I made to connect to the Samba input, or a standard BNC cable to connect to the Transonic input.
 5. Follow steps 7-9 of the Samba instructions and test the device.
 
+The photo below illustrates the setup, as well as the correct positioning of the knobs on the function generator.
+
+![](/images/test_setup.JPG)
+
 ### Setup for Samba 202 Pressure Measurement System
 
 If this is your first time handling the Samba probes, take the time to read the relevant sections of the Samba user manual (included in the box). For invasive measurements you will require distiled and de-ionized water for cleaning the transducer tip, which you can obtain from the wet lab on the 8th floor of the Peter Gilgan Center for Research and Learning (the dispenser is a blue nozzle attached to the main sink). Sterile glassware is available in the hallway that separates the dry lab from the wet lab, you're free to take what you need as long as you return it to the same station for washing.
@@ -24,9 +28,14 @@ If this is your first time handling the Samba probes, take the time to read the 
 6. Ensure that the INPUT SELECT toggle switch is in the left position (facing the SAMBA input connector).
 7. Use the 25ft RCA cable to connect the trigger unit to the external trigger input on the MRI scanner. The external trigger input is on the left side of the scanner, and is marked with a little arrow directed inwards.
 8. Plug the USB cable attached to the pressure trigger module to a computer. Ensure that the computer is plugged in (not just running on battery). This is important, because not all laptops maintain a steady 5V USB voltage when they're running on battery power.
-9. Launch "software-name-here.exe" on the computer.
+9. Launch "realtimePlot.exe" on the computer.
 10. Use the serial port selector (dropdown menu on bottom left corner) and choose the port called Teensy USB Serial.
 11. Press Start and watch to see whether the system is triggering as expected.
+
+The photo below illustrates most of the connections that you will need to make, as well as the screen that you should see when the Samba pressure measurement system is functioning properly.
+![](/images/samba_setup.JPG)
+
+NOTE: The Samba sensors module is powered by USB, and has an internal battery. The battery should last for more than an hour of sustained used, but the unit is old enough that it can not be counted on. The easiest way to power the unit is via USB, (I searched many hardware stores for the DC jack that would fit the 5V input, with no success). A standard 2.5W (5V/500mA) USB power supply (which is the output of a standard computer, laptop or iPhone wall wart) does not provide enough power to keep the unit from running dead. Its possible that connecting the Samba device to a higher wattage USB power supply such as an iPad charger may keep it running steadily.
 
 ### Setup for Transonic TS420 Perivascular Flow Module
 

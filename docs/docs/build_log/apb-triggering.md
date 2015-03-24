@@ -29,7 +29,7 @@ The slope sum function is:
 
 Here's an example blood pressure recording (in blue) and the corresponding slope sum function output (in red):
 
-<img src='/images/ssf_demo.png' alt="Slope Sum funciton applied to blood pressure waveform" style="width: 600px;"/>
+![alt text](/images/ssf_demo.png "An arterial blood pressure pulse")
 
 This simple function is extremely useful for two reasons:
 

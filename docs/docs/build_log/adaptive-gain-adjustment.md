@@ -1,12 +1,12 @@
 ## Variable Gain Amplifier with SPI Interface
 
-A major problem with triggering off of the fetal blood pressures is that the signal coming from the transducers is relatively small compared to the full scale of the pressure measurement instrument (numbers given below in specifications). To resolve this issue, I considered three possible solutions:
+A major problem with triggering from fetal blood pressures is that the signal coming from the transducers is relatively small compared to the full scale of the pressure measurement instrument (numbers given below in specifications). To resolve this issue, I considered three possible solutions:
 
 1. Use an analog potentiometer in the gain feedback path, which the experimenter can adjust by turning a knob.
 2. Use a digital potentiometer in the feedback path which the experimenter can adjust by pressing increment and decrement buttons.
 3. Use a digital potentiometer in the gain feedback path which is automatically adjusted by the microcontroller whenever the signal level is out of range.
 
-After due consideration, I opted to use strategy #3. Having the microcontroller perform the adjustment is advantageous because the microntroller can adjust the gain smoothly and gradually over a period of one minute or more, which will ensure that the gain adjustments do not interfere with the constantly running triggering algorithm.
+After due consideration, I opted to use strategy #3. Having the microcontroller perform the adjustment is advantageous because the microntroller can adjust the gain smoothly and gradually over a period of several seconds, which will ensure that the gain adjustments do not interfere with the constantly running triggering algorithm.
 
 ### Specifications
 
@@ -31,6 +31,4 @@ I started by patching up a simple non-inverting amplifier, on a breadboard like 
 
 This amplifier had an adjustable gain range of 1.1 V/V to 11 V/V with 256 subdivisions. This is more than enough gain to amplify a 70/30 mmHg signal to the full range of the ADC.
 
-With that all patched up and working, all that remains is to write an efficient algorithm for bringing the signal into full range in real time.
-
-The algorithm development is documented in this post:
+With that all patched up and working, all that remains is to write an efficient algorithm for bringing the signal into full range in real time. The software implementation process is described in the post: *Gain Adjustment Algorithm*.
