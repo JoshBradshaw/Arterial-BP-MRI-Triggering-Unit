@@ -37,7 +37,7 @@ int TARGET_AMPLITUDE; // ~2.67 V from the noninverting amplifier
 const int MAX_SIGNAL_AMPLITUDE = 55000; // ~4.20 V from the noninverting amplifier
 // number of potentiomter codes to correct by if signal is out of range
 // a higher number results in a faster correction
-const int CORRECTION = 10;
+const int CORRECTION = 2;
 
 volatile int potentiometerValue = 0; // range 0-256 where 0 -> ~84 ohms and 256 -> ~50 k-ohms
 // if gain is being shifted up or down, this gives the stopping value

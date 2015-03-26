@@ -86,7 +86,7 @@ private:
     volatile bool rising = true;
     volatile int left_moving_sum = 0;
     volatile int right_moving_sum = 0;
-    volatile int refractory_period = 40; // 40 samples at 250Hz = 160ms which gives 375BPM maximum heart rate
+    volatile int refractory_period = 80; // 40 samples at 250Hz = 160ms which gives 375BPM maximum heart rate
     volatile int rp_counter = 0;
     volatile int peak_threshold = 0;
     volatile int peak_threshold_sum = 0;
@@ -101,7 +101,7 @@ public:
         peak_threshold_sum += newPeakVal;
         pb.addSample(newPeakVal);
 
-        peak_threshold = peak_threshold_sum / (BUFFER_LEN * 3);
+        peak_threshold = peak_threshold_sum / (BUFFER_LEN * 2);
     }
 
     void updateMovingAverages() {

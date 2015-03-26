@@ -1,5 +1,13 @@
 ## System Overview
 
+<style>
+td { 
+  border: solid;
+  border-width: 1px 1px;
+  padding: 5px;
+}
+</style>
+
 The Arterial Blood Pressure Triggering System is an open source tool developed at SickKids. The system converts a blood pressure signal into a TTL signal, as illustrated below.
 
 ![alt text](/images/bp_vs_ttl.jpg "illustration of how the triggering system transforms blood pressure signal into TTL signal")
@@ -23,18 +31,26 @@ The triggering unit is shown below:
 
 The connections on the front panel of the triggering unit are:
 
-
-Samba Sensor Input (s-video)|Transonic Sensor Input (BNC) |External Trigger Out (RCA) 
-----------------------------|-----------------------------|--------------------------
-Input Selection Switch      |                             |Trigger Status LED
-
+<table>
+	<tr>
+		<td>Samba Sensor Input (s-video)</td>
+		<td>Transonic Sensor Input (BNC)</td>
+		<td>External Trigger Out (RCA)</td>
+	</tr>
+	<tr>
+		<td>Input Selection Switch</td>
+		<td></td>
+		<td>Trigger Status LED</td>
+	</tr>
+</table>
+<br />
 Finally, a USB cable runs out of the back corner of the unit. This cable is connected to a computer to power the unit, and optionally to transfer the blood pressure readings to the monitoring software.
 
 ## Monitoring Software
 
 ![alt text](/images/monitoring_system.png "triggering unit photo")
 
-The monitoring tool give the experimenter real feedback on the pressure catheter and the triggering signal. The top chart animation shows the input signal from the pressure catheter, and the bottom chart animation shows the triggering signal that's been sent to the scanner. These charts are updated in real-time with <20ms of delay, so you'll be aware of any irregular heartbeats, or problems with the pressure catheter, right as they happen. Every run of the triggering unit is logged with time and date stamps, so it can be compared with the MRI data in post processing if required.
+The monitoring tool give the experimenter real-time feedback on the pressure catheter and the triggering signal. The top chart animation shows the input signal from the pressure catheter, and the bottom chart animation shows the triggering signal that's been sent to the scanner. These charts are updated in real-time with <20ms of delay, so you'll be aware of any irregular heartbeats, or problems with the pressure catheter, right as they happen. Every run of the triggering unit is logged with time and date stamps, so it can be compared with the MRI data in post processing if required.
 
 For more information about the monitoring software see:
 1. Monitoring software design
@@ -45,6 +61,6 @@ The SickKids research MRI scanner is the Siemens Magnetom Trio with a field stre
 
 ### How to aquire a unit
 
-So far only two of these units have been built, and they were both hand assembled. If you're moderately competant with software and electronics you can build one yourself using the schematics and this tutuorial.
+So far only two of these units have been built, and they were both hand assembled. If you're moderately competant with software and electronics you can build one yourself using the schematics. The parts are listed in the schematics directory, and all of the components are avaialble from digikey. For the PCB board, I may be able to provide you one of my spares. Failing that, you can easily send the GERBER files to any circuit board manufacturer to have them assembled.
 
 Feel free to email me at joshbradshaw11@gmail.com if you are interested in adapting this unit to work with a different blood pressure instrument, or want to commision me to build one for you.
