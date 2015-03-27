@@ -86,10 +86,14 @@ private:
     volatile bool rising = true;
     volatile int left_moving_sum = 0;
     volatile int right_moving_sum = 0;
-    volatile int refractory_period = 80; // 40 samples at 250Hz = 160ms which gives 375BPM maximum heart rate
+    volatile int refractory_period = 40; // 40 samples at 250Hz = 160ms which gives 375BPM maximum heart rate
     volatile int rp_counter = 0;
     volatile int peak_threshold = 0;
     volatile int peak_threshold_sum = 0;
+    
+    int peak1 = 0;
+    int peak2 = 0;
+    int peak3 = 0;
 
 public:
     void updatePeakThreshold(int newPeakVal) {
@@ -97,11 +101,14 @@ public:
         // averaging over more peaks makes reduces sensitivity to amplitude spikes
         // thresholds are set at ~1/3 of the average amplitude, because testing showed
         // that they don't need to be very high
-        peak_threshold_sum -= pb[0];
+        peak_threshold_sum -= peak1;
         peak_threshold_sum += newPeakVal;
-        pb.addSample(newPeakVal);
-
-        peak_threshold = peak_threshold_sum / (BUFFER_LEN * 2);
+        
+        peak1 = peak2;
+        peak2 = peak3;
+        peak3 = newPeakVal;
+        
+        peak_threshold = peak_threshold_sum / 6;
     }
 
     void updateMovingAverages() {

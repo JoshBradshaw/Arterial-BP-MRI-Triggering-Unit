@@ -89,7 +89,7 @@ void sample() {
     if (serial_update_count < SERIAL_UPDATE_PERIOD) {
         serial_update_count++;
     } else {
-        Serial.println(ssfVal);
+        Serial.println(sampleVal);
         serial_update_count = 0;
     }
 }
