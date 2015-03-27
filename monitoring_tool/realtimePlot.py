@@ -11,6 +11,7 @@ import serial.tools.list_ports
 import logging
 import logging.handlers
 from datetime import datetime
+from pprint import pprint
 
 TRIGGER_PULSE_CODE = 100000
 SIXTEEN_BIT_TO_COUNTS = 13107.2 # 2^16 counts / 5 V = 13107.2 counts / volt
@@ -33,6 +34,9 @@ gui.setupUi(win_plot)
 gui.bpPlot.setAxisScale(0, 0, 5, 5)
 gui.bpPlot.setAxisScale(1, 0, 4, 4)
 gui.bpPlot.setAxisTitle(0, "BP Signal (V)")
+gui.ssfPlot.setAxisScale(0, 0, 10, 10)
+gui.ssfPlot.setAxisScale(1, 0, 4, 4)
+gui.ssfPlot.setAxisTitle(0, "BP Signal (V)")
 gui.triggerPlot.setAxisScale(0, 0, 1, 1)
 gui.triggerPlot.setAxisMaxMinor(0, 1)
 gui.triggerPlot.setAxisTitle(0, "Logic Level")
@@ -45,12 +49,26 @@ bp_curve.attach(gui.bpPlot)
 bp_curve.setPaintAttribute(Qwt.QwtPlotCurve.PaintFiltered, False)
 bp_curve.setPaintAttribute(Qwt.QwtPlotCurve.ClipPolygons, True)
 bp_curve.setPen(Qt.QPen(Qt.Qt.green))
+
+ssf_curve=Qwt.QwtPlotCurve()  
+ssf_curve.attach(gui.ssfPlot)
+ssf_curve.setPaintAttribute(Qwt.QwtPlotCurve.PaintFiltered, False)
+ssf_curve.setPaintAttribute(Qwt.QwtPlotCurve.ClipPolygons, True)
+ssf_curve.setPen(Qt.QPen(Qt.Qt.green))
 # line on triggering graph
 trigger_curve = Qwt.QwtPlotCurve()
-trigger_curve.attach(gui.triggerPlot)
+trigger_curve.attach(gui.bpPlot)
 trigger_curve.setPaintAttribute(Qwt.QwtPlotCurve.PaintFiltered, False)
 trigger_curve.setPaintAttribute(Qwt.QwtPlotCurve.ClipPolygons, True)
-trigger_curve.setPen(Qt.QPen(Qt.Qt.green))
+
+sympen = Qt.QPen(Qt.Qt.red)
+sympen.setWidth(5)
+trigger_curve.setStyle(-1)
+trigger_curve.setSymbol(Qwt.QwtSymbol(Qwt.QwtSymbol. DTriangle,
+                                      Qt.QBrush(),
+                                      sympen,
+                                      Qt.QSize(10, 10)))
+trigger_curve.setPen(Qt.QPen(Qt.Qt.red))
 
 # if its a windows 7 machine clean up the blinkyness by running anti aliasing
 # if its a windows xp or mac, do not run anti aliasing because it will lag
@@ -66,7 +84,7 @@ except:
 if anti_alias:
     trigger_curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased) # prettier, but laggy on slow computers
     bp_curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased) # prettier, but laggy on slow computers
-
+    ssf_curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
 
 log_dir = "logs"
 if not os.path.exists(log_dir):
@@ -118,11 +136,12 @@ class Teensy(object):
 
     def get_sensor_val(self):
         """read one line of data over serial and parse it"""
-        try:
-            return int(self.ser.readline())
-        except ValueError:
-            print "Failed to parse serial input"
-            return
+        serial_line = self.ser.readline()
+        sampleval, ssfval = serial_line.split()
+        sampleval = int(sampleval)
+        ssfval = int(ssfval)
+        return sampleval, ssfval
+
     
     def get_serial_port(self):
         """get the port which is currently selected in the form"""
@@ -140,30 +159,39 @@ class plotData(object):
 
     def plot_bp_and_trigger(self):
         """shifts the lines on the chart animation by one points, and adds the new point to the rightmost edge"""
-        val = self.teensy.get_sensor_val()
+        sensor_values = self.teensy.get_sensor_val()
+        
+        if sensor_values is None:
+            return
+
+        sampleval, ssfval = sensor_values
         # trigger pulses are not marked immediately, instead they are marked when the next sensor
         # value is recieved for the sake of staying in perfect synch
-        if val == TRIGGER_PULSE_CODE:
+        if sampleval == TRIGGER_PULSE_CODE:
             self.trigger = True
             return
         # shift the curves one point
         self.ys=numpy.roll(self.ys, -1)
-        self.ts=numpy.roll(self.ts, -1)  
+        self.ts=numpy.roll(self.ts, -1)
+        self.ss=numpy.roll(self.ss, -1)  
         # 16 bit ADC value range 0-65536, want to reduce to 0-5V for human readability
-        self.ys[self.last_point] = val / SIXTEEN_BIT_TO_COUNTS
+        self.ys[self.last_point] = sampleval / SIXTEEN_BIT_TO_COUNTS
+        self.ss[self.last_point] = ssfval / SIXTEEN_BIT_TO_COUNTS
         # mark trigger pulse
         if self.trigger:
-            self.ts[self.last_point] = 1
+            self.ts[self.last_point] = sampleval / SIXTEEN_BIT_TO_COUNTS
             self.trigger = False
         else:
-            self.ts[self.last_point] = 0
+            self.ts[self.last_point] = -1
         # log the sample
         logger.info("{}: {} {}".format(datetime.now().strftime('%Y-%m-%d-%H-%M-%f'), self.ys[self.last_point], self.ts[self.last_point]))
         # redraw the lines (note this is really inefficient, redrawing a dirty rectangle only would be much faster)
         bp_curve.setData(self.xs, self.ys)
         gui.bpPlot.replot() 
-        trigger_curve.setData(self.xs, self.ts)
+        trigger_curve.setData(self.xs, self.ts+0.3)
         gui.triggerPlot.replot()
+        ssf_curve.setData(self.xs, self.ss)
+        gui.ssfPlot.replot()
 
     def select_speed(self):
         """get the speed selected on the dropdown and setup the axis scales accordingly"""
@@ -173,6 +201,8 @@ class plotData(object):
         self.last_point = self.numPoints-1
         self.ys = numpy.zeros(self.numPoints)
         self.ts = numpy.zeros(self.numPoints)
+        self.ts.fill(-1)
+        self.ss = numpy.zeros(self.numPoints)
         self.trigger = False
 
     def start_stop(self):

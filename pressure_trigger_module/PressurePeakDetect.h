@@ -1,7 +1,7 @@
 #ifndef __PRESSUREPEAKDETECTH__
 #define __PRESSUREPEAKDETECTH__
 
-const int BUFFER_LEN = 15; // determines how many samples will be stored at a time
+const int BUFFER_LEN = 10; // determines how many samples will be stored at a time
 
 class circularBuffer {
     // old items overwrite new items
@@ -43,6 +43,27 @@ public:
 };
 
 
+//Low pass chebyshev filter order=1 alpha1=0.2 
+class filter
+{
+	public:
+		filter()
+		{
+			v[0]=0;
+			v[1]=0;
+		}
+	private:
+		int v[2];
+	public:
+		int step(int x)
+		{
+			int tmp = v[0];
+                        v[0] = v[1];
+                        v[1] = x;
+                        return (tmp + v[0] + v[1]) / 3; 
+		}
+};
+
 class slopesum {
     // taken from MIT, this filter excentuates the first rising edge
     // of the signal, and removes the secondary knee
@@ -57,6 +78,7 @@ public:
         // slopes. we just subtract the contribution of the one we're taking away, and add
         // the contribution of the one we're adding
         int old_slope = sampleBuffer[1] - sampleBuffer[0];
+        
         if (old_slope > 0) {
             slope_sum -= old_slope;
         }
@@ -86,7 +108,7 @@ private:
     volatile bool rising = true;
     volatile int left_moving_sum = 0;
     volatile int right_moving_sum = 0;
-    volatile int refractory_period = 40; // 40 samples at 250Hz = 160ms which gives 375BPM maximum heart rate
+    volatile int refractory_period = 50; // 40 samples at 250Hz = 160ms which gives 375BPM maximum heart rate
     volatile int rp_counter = 0;
     volatile int peak_threshold = 0;
     volatile int peak_threshold_sum = 0;
@@ -94,6 +116,9 @@ private:
     int peak1 = 0;
     int peak2 = 0;
     int peak3 = 0;
+    int peak4 = 0;
+    int peak5 = 0;
+    int peak6 = 0;
 
 public:
     void updatePeakThreshold(int newPeakVal) {
@@ -106,18 +131,21 @@ public:
         
         peak1 = peak2;
         peak2 = peak3;
-        peak3 = newPeakVal;
+        peak3 = peak4;
+        peak4 = peak5;
+        peak5 = peak6;
+        peak6 = newPeakVal;
         
-        peak_threshold = peak_threshold_sum / 6;
+        peak_threshold = peak_threshold_sum / 12;
     }
 
     void updateMovingAverages() {
         // update right moving average
         right_moving_sum += sb[-1];
-        right_moving_sum -= sb[-4];
+        right_moving_sum -= sb[-2];
         // update left moving average
-        left_moving_sum += sb[-7];
-        left_moving_sum -= sb[-10];
+        left_moving_sum += sb[-5];
+        left_moving_sum -= sb[-6];
     }
 
     bool isPeak(const int x) {
@@ -131,12 +159,25 @@ public:
             return(true);
         }
 
-        if (!rising && rp_counter >= refractory_period
-                && left_moving_sum > peak_threshold
-                && left_moving_sum < right_moving_sum) {
+        if (!rising && rp_counter >= refractory_period 
+        && right_moving_sum > peak_threshold
+        && left_moving_sum < right_moving_sum) {
             rising = true;
         } else {
             rp_counter += 1;
+            
+            // reset threshold if too much time has passed
+            if (rp_counter > 350) {
+              peak_threshold_sum = 0;
+              peak_threshold = 0;
+              peak1 = 0;
+              peak2 = 0;
+              peak3 = 0;
+              peak4 = 0;
+              peak5 = 0;
+              peak6 = 0;
+              
+            }
         }
         return(false);
     }

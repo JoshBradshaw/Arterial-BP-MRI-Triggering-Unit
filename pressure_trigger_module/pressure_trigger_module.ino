@@ -27,6 +27,7 @@ const int SERIAL_UPDATE_PERIOD = 4;
 int serial_update_count = 0;
 const int TRIGGER_SENT_CODE = 100000;
 
+filter filt;
 slopesum ssf;
 peakDetect pd;
 
@@ -58,7 +59,8 @@ void sample() {
     // signal pathway
     // blood pressure transducer --> Arduino ADC --> low pass filter --> slopesum function --> peak detector
     int sampleVal = analogRead(ANALOG_INPUT_PIN);
-    int ssfVal = ssf.step(sampleVal);
+    int filteredVal = filt.step(sampleVal);
+    int ssfVal = ssf.step(filteredVal);
     bool sampleIsPeak = pd.isPeak(ssfVal);
 
     if(sampleIsPeak) {
@@ -66,7 +68,7 @@ void sample() {
         digitalWrite(LED_PIN, HIGH);
         triggerPulseHigh = true;
         pulseDurationCount = 0;
-        Serial.println(TRIGGER_SENT_CODE); // signal to the monitoring software that trigger sent
+        Serial.printf("100000 0\n"); // signal to the monitoring software that trigger sent
     }
 
     if (triggerPulseHigh && pulseDurationCount >= PULSE_DURATION) {
@@ -89,7 +91,7 @@ void sample() {
     if (serial_update_count < SERIAL_UPDATE_PERIOD) {
         serial_update_count++;
     } else {
-        Serial.println(sampleVal);
+        Serial.printf("%d %d\n", sampleVal, ssfVal);
         serial_update_count = 0;
     }
 }
