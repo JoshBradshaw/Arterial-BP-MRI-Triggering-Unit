@@ -17,6 +17,8 @@ TRIGGER_PULSE_CODE = 100000
 SIXTEEN_BIT_TO_COUNTS = 13107.2 # 2^16 counts / 5 V = 13107.2 counts / volt
 SERIAL_BAUDRATE = 115200
 
+log_dir = "logs"
+
 # larger x-axis -> slower progression of the line accross the plot
 speeds = {
     'Slowest': 40,
@@ -34,9 +36,6 @@ gui.setupUi(win_plot)
 gui.bpPlot.setAxisScale(0, 0, 5, 5)
 gui.bpPlot.setAxisScale(1, 0, 4, 4)
 gui.bpPlot.setAxisTitle(0, "BP Signal (V)")
-gui.ssfPlot.setAxisScale(0, 0, 5, 5)
-gui.ssfPlot.setAxisScale(1, 0, 4, 4)
-gui.ssfPlot.setAxisTitle(0, "BP Signal (V)")
 
 # times the plot refresh
 gui.timer = QtCore.QTimer()
@@ -47,11 +46,6 @@ bp_curve.setPaintAttribute(Qwt.QwtPlotCurve.PaintFiltered, False)
 bp_curve.setPaintAttribute(Qwt.QwtPlotCurve.ClipPolygons, True)
 bp_curve.setPen(Qt.QPen(Qt.Qt.green))
 
-ssf_curve=Qwt.QwtPlotCurve()  
-ssf_curve.attach(gui.ssfPlot)
-ssf_curve.setPaintAttribute(Qwt.QwtPlotCurve.PaintFiltered, False)
-ssf_curve.setPaintAttribute(Qwt.QwtPlotCurve.ClipPolygons, True)
-ssf_curve.setPen(Qt.QPen(Qt.Qt.green))
 # line on triggering graph
 trigger_curve = Qwt.QwtPlotCurve()
 trigger_curve.attach(gui.bpPlot)
@@ -82,9 +76,8 @@ except:
 if anti_alias:
     trigger_curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased) # prettier, but laggy on slow computers
     bp_curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased) # prettier, but laggy on slow computers
-    ssf_curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
 
-log_dir = "logs"
+
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 
@@ -134,11 +127,16 @@ class Teensy(object):
 
     def get_sensor_val(self):
         """read one line of data over serial and parse it"""
-        serial_line = self.ser.readline()
-        sampleval, ssfval = serial_line.split()
-        sampleval = int(sampleval)
-        ssfval = int(ssfval)
-        return sampleval, ssfval
+        try:
+            serial_line = self.ser.readline()
+            sampleval, trigger = serial_line.split()
+            sampleval = int(sampleval)
+            trigger = int(trigger)
+        except ValueError:
+            print "Failed to parse input, ensure that the serial port selector is set to Teensy USB Serial"
+            return None
+
+        return sampleval, trigger
 
     
     def get_serial_port(self):
@@ -154,52 +152,59 @@ class plotData(object):
         self.select_speed()
         self.logging = gui.logDataButton.isChecked()
         self.teensy = Teensy()
+        self.redraw_period = 2 # redraw once every 5 samples at 250Hz for 50fps redraws
+        self.redraw_count = 0
+        self.trigger_pulse_width = 4
+        self.trigger_count = 0
 
-    def plot_bp_and_trigger(self):
+    def update_curves(self):
         """shifts the lines on the chart animation by one points, and adds the new point to the rightmost edge"""
         sensor_values = self.teensy.get_sensor_val()
         
         if sensor_values is None:
             return
 
-        sampleval, ssfval = sensor_values
+        sampleval, trigger = sensor_values
         # trigger pulses are not marked immediately, instead they are marked when the next sensor
         # value is recieved for the sake of staying in perfect synch
-        if sampleval == TRIGGER_PULSE_CODE:
-            self.trigger = True
-            return
+
         # shift the curves one point
         self.ys=numpy.roll(self.ys, -1)
         self.ts=numpy.roll(self.ts, -1)
-        self.ss=numpy.roll(self.ss, -1)  
         # 16 bit ADC value range 0-65536, want to reduce to 0-5V for human readability
         self.ys[self.last_point] = sampleval / SIXTEEN_BIT_TO_COUNTS
-        self.ss[self.last_point] = ssfval / SIXTEEN_BIT_TO_COUNTS
         # mark trigger pulse
-        if self.trigger:
-            self.ts[self.last_point] = sampleval / SIXTEEN_BIT_TO_COUNTS
-            self.trigger = False
+        if trigger and self.trigger_count > self.trigger_pulse_width:
+            # make the trigger marker appear just above the BP plot line
+            self.ts[self.last_point] = (sampleval / SIXTEEN_BIT_TO_COUNTS) + 0.1
+            self.trigger_count = 0
         else:
             self.ts[self.last_point] = -1 # -1 will place these points outside the plot's viewable area
+            self.trigger_count += 1
+
+        if self.redraw_count < self.redraw_period:
+            self.redraw_count += 1
+        else:
+            self.redraw_plot()
+            self.redraw_count = 0
+
         # log the sample
         logger.info("{}: {} {}".format(datetime.now().strftime('%Y-%m-%d-%H-%M-%f'), self.ys[self.last_point], self.ts[self.last_point]))
-        # redraw the lines (note this is really inefficient, redrawing a dirty rectangle only would be much faster)
+
+    def redraw_plot(self):
         bp_curve.setData(self.xs, self.ys)
         gui.bpPlot.replot() 
         trigger_curve.setData(self.xs, self.ts+0.3)
-        ssf_curve.setData(self.xs, self.ss)
-        gui.ssfPlot.replot()
 
     def select_speed(self):
         """get the speed selected on the dropdown and setup the axis scales accordingly"""
         self.speed = speeds[str(gui.speedSelect.currentText())]
-        self.xs = numpy.arange(0, self.speed, 0.016)
+        self.xs = numpy.arange(0, self.speed, 0.012)
         self.numPoints = len(self.xs)
         self.last_point = self.numPoints-1
         self.ys = numpy.zeros(self.numPoints)
         self.ts = numpy.zeros(self.numPoints)
         self.ts.fill(-1)
-        self.ss = numpy.zeros(self.numPoints)
         self.trigger = False
 
     def start_stop(self):
@@ -207,8 +212,8 @@ class plotData(object):
         if gui.startBtn.isChecked():
             handler.doRollover()
             self.teensy.start()
-            gui.timer.start(1.0) # poll the serial port every 1ms, 1 byte is expected every 4ms
-            win_plot.connect(gui.timer, QtCore.SIGNAL('timeout()'), self.plot_bp_and_trigger) 
+            gui.timer.start(0.25) # poll the serial port every 1ms, 1 byte is expected every 4ms
+            win_plot.connect(gui.timer, QtCore.SIGNAL('timeout()'), self.update_curves) 
         else:
             gui.timer.stop()
             self.teensy.stop()

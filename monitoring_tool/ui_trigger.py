@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_trigger.ui'
 #
-# Created: Mon Mar 30 09:56:24 2015
+# Created: Mon Mar 30 11:09:32 2015
 #      by: PyQt4 UI code generator 4.9.6
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_win_trigger(object):
     def setupUi(self, win_trigger):
         win_trigger.setObjectName(_fromUtf8("win_trigger"))
-        win_trigger.resize(672, 720)
+        win_trigger.resize(672, 323)
         win_trigger.setAutoFillBackground(False)
         win_trigger.setStyleSheet(_fromUtf8("/*\n"
 "    Copyright 2013 Emanuel Claesson\n"
@@ -336,35 +336,29 @@ class Ui_win_trigger(object):
         self.label = QtGui.QLabel(self.centralwidget)
         self.label.setObjectName(_fromUtf8("label"))
         self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
-        self.label_3 = QtGui.QLabel(self.centralwidget)
-        self.label_3.setObjectName(_fromUtf8("label_3"))
-        self.gridLayout.addWidget(self.label_3, 2, 0, 1, 1)
         self.serialPortSelector = QtGui.QComboBox(self.centralwidget)
         self.serialPortSelector.setObjectName(_fromUtf8("serialPortSelector"))
-        self.gridLayout.addWidget(self.serialPortSelector, 4, 0, 1, 1)
+        self.gridLayout.addWidget(self.serialPortSelector, 2, 0, 1, 1)
         self.speedSelect = QtGui.QComboBox(self.centralwidget)
         self.speedSelect.setObjectName(_fromUtf8("speedSelect"))
         self.speedSelect.addItem(_fromUtf8(""))
         self.speedSelect.addItem(_fromUtf8(""))
         self.speedSelect.addItem(_fromUtf8(""))
         self.speedSelect.addItem(_fromUtf8(""))
-        self.gridLayout.addWidget(self.speedSelect, 4, 1, 1, 1)
+        self.gridLayout.addWidget(self.speedSelect, 2, 1, 1, 1)
         self.startBtn = QtGui.QPushButton(self.centralwidget)
         self.startBtn.setCheckable(True)
         self.startBtn.setChecked(False)
         self.startBtn.setObjectName(_fromUtf8("startBtn"))
-        self.gridLayout.addWidget(self.startBtn, 4, 2, 1, 1)
+        self.gridLayout.addWidget(self.startBtn, 2, 2, 1, 1)
         self.logDataButton = QtGui.QPushButton(self.centralwidget)
         self.logDataButton.setCheckable(False)
         self.logDataButton.setChecked(False)
         self.logDataButton.setObjectName(_fromUtf8("logDataButton"))
-        self.gridLayout.addWidget(self.logDataButton, 4, 3, 1, 1)
+        self.gridLayout.addWidget(self.logDataButton, 2, 3, 1, 1)
         self.bpPlot = Qwt5.QwtPlot(self.centralwidget)
         self.bpPlot.setObjectName(_fromUtf8("bpPlot"))
         self.gridLayout.addWidget(self.bpPlot, 1, 0, 1, 4)
-        self.ssfPlot = Qwt5.QwtPlot(self.centralwidget)
-        self.ssfPlot.setObjectName(_fromUtf8("ssfPlot"))
-        self.gridLayout.addWidget(self.ssfPlot, 3, 0, 1, 4)
         win_trigger.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(win_trigger)
@@ -373,7 +367,6 @@ class Ui_win_trigger(object):
     def retranslateUi(self, win_trigger):
         win_trigger.setWindowTitle(_translate("win_trigger", "MainWindow", None))
         self.label.setText(_translate("win_trigger", "Blood Pressure Signal Plot", None))
-        self.label_3.setText(_translate("win_trigger", "Filtered Signal Plot", None))
         self.speedSelect.setItemText(0, _translate("win_trigger", "Slowest", None))
         self.speedSelect.setItemText(1, _translate("win_trigger", "Slow", None))
         self.speedSelect.setItemText(2, _translate("win_trigger", "Medium", None))

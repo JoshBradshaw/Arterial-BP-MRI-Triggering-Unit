@@ -4,35 +4,31 @@
 
 IntervalTimer sampletimer;
 
-// signal processing pathway to transform raw blood pressure input signal into
-// MRI triggering signal
-// Loosely based on the algorithm developed by Zong et. al at MIT in
-// An Open-source Algorithm to Detect Onset of Arterial Blood Pressure Pulses
-// Computers in Cardiology, 2003; 30:259-262
-
-// only affects falling edge of the TTL signal, so millis() polling is accurate enough
+// written for Teensy 3.1 running at 96 MHz
 
 const int SAMPLING_PERIOD = 4; // milliseconds
 const int TRIGGER_PULSE_DURATION = 20; // milliseconds
 const int SCANNER_TRIGGER_PIN = 19;
 const int LED_PIN = 18;
-int ANALOG_INPUT_PIN;
+
 const int PULSE_DURATION = TRIGGER_PULSE_DURATION / SAMPLING_PERIOD;
 const int GAIN_ADJUST_PERIOD = 100; // milliseconds
 const int gainAdjustDuration = GAIN_ADJUST_PERIOD / SAMPLING_PERIOD;
 volatile int pulseDurationCount;
 volatile int gainAdjustCount = 0;
 volatile bool triggerPulseHigh = false;
-const int SERIAL_UPDATE_PERIOD = 4;
-int serial_update_count = 0;
-const int TRIGGER_SENT_CODE = 100000;
+
+volatile int ANALOG_INPUT_PIN; // set at startup depending on switch position
+volatile int serial_update_count = 0;
+const int SAMPLE_SEND_PERIOD = 3;
+volatile int sampleSendCount = 0;
 
 filter filt;
 slopesum ssf;
 peakDetect pd;
 
 void setup() {
-    Serial.begin(115200); // fastest stable BAUD rate
+    Serial.begin(115200); // fastest stable BAUD rate (Hz)
     analogReadRes(16);  // the teensy has 16 bit ADCs
     pinMode(SCANNER_TRIGGER_PIN, OUTPUT);
     pinMode(LED_PIN, OUTPUT);
@@ -68,7 +64,6 @@ void sample() {
         digitalWrite(LED_PIN, HIGH);
         triggerPulseHigh = true;
         pulseDurationCount = 0;
-        Serial.printf("100000 0\n"); // signal to the monitoring software that trigger sent
     }
 
     if (triggerPulseHigh && pulseDurationCount >= PULSE_DURATION) {
@@ -78,7 +73,6 @@ void sample() {
     } else if (triggerPulseHigh) {
         pulseDurationCount++;
     } else {
-        // do nothing
     }
 
     if (gainAdjustCount >= gainAdjustDuration) {
@@ -87,11 +81,11 @@ void sample() {
     } else {
         gainAdjustCount++;
     }
-
-    if (serial_update_count < SERIAL_UPDATE_PERIOD) {
-        serial_update_count++;
+    // send data to the plotting/logging program
+    if (sampleSendCount < SAMPLE_SEND_PERIOD) {
+        sampleSendCount += 1;
     } else {
-        Serial.printf("%d %d\n", sampleVal, ssfVal);
-        serial_update_count = 0;
+        Serial.printf("%d %d\n", sampleVal, triggerPulseHigh);
+        sampleSendCount = 0;
     }
 }

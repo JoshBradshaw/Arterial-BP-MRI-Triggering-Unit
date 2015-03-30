@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>672</width>
-    <height>720</height>
+    <height>323</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -330,16 +330,9 @@ QMenu::separator {
      </widget>
     </item>
     <item row="2" column="0">
-     <widget class="QLabel" name="label_3">
-      <property name="text">
-       <string>Filtered Signal Plot</string>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="0">
      <widget class="QComboBox" name="serialPortSelector"/>
     </item>
-    <item row="4" column="1">
+    <item row="2" column="1">
      <widget class="QComboBox" name="speedSelect">
       <item>
        <property name="text">
@@ -363,7 +356,7 @@ QMenu::separator {
       </item>
      </widget>
     </item>
-    <item row="4" column="2">
+    <item row="2" column="2">
      <widget class="QPushButton" name="startBtn">
       <property name="toolTip">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Start plotting the trigger and sensor data&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -379,7 +372,7 @@ QMenu::separator {
       </property>
      </widget>
     </item>
-    <item row="4" column="3">
+    <item row="2" column="3">
      <widget class="QPushButton" name="logDataButton">
       <property name="toolTip">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If toggled on, log files will be created based on the triggering data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -397,9 +390,6 @@ QMenu::separator {
     </item>
     <item row="1" column="0" colspan="4">
      <widget class="QwtPlot" name="bpPlot"/>
-    </item>
-    <item row="3" column="0" colspan="4">
-     <widget class="QwtPlot" name="ssfPlot"/>
     </item>
    </layout>
   </widget>
