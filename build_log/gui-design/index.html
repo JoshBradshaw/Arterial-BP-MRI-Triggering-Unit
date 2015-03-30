@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="../../instructions/user_manual" class="icon icon-home"> Arterial BP Triggering</a>
+        <a href="../.." class="icon icon-home"> Arterial BP Triggering</a>
         
       </div>
 
@@ -51,6 +51,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../../instructions/guidelines-for-adapting-to-new-instrument">Guidelines for using a Different Pressure Measurement System</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../instructions/reflash-the-microcontroller">Reflashing the Microcontroller</a>
                     
                 </li>
             
@@ -113,7 +118,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href="../../instructions/user_manual"></a>
+        <a href="../.."></a>
       </nav>
 
       
@@ -121,7 +126,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../../instructions/user_manual">Docs</a> &raquo;</li>
+    <li><a href="../..">Docs</a> &raquo;</li>
     <li>Monitoring Tool</li>
       <li class="wy-breadcrumbs-aside">
         
@@ -137,22 +142,21 @@
             <div class="section">
               <h2 id="signal-monitoring-tool">Signal Monitoring Tool</h2>
 <p>The blood pressure triggering device needs to have an interface so that the researcher operating it can tell whether it is functioning properly. The interface must provide the operator with near real-time feedback on the signal level of the pressure sensor, and the timing of the trigger pulses. The interface should provide the researcher with an easy way to export the pressure data for further analysis, and should be sufficiently simple to install on a new computer that it can be quickly transferred via USB key or network drive to a different computer.</p>
-<p>The tool is based entirely on <a href="http://www.swharden.com/blog/2013-05-08-realtime-data-plotting-in-python/">this excellent project</a>. All I did was modify the form, integrate the python serial library to get the sensor values from the Teensy over Serial, and add a couple of buttons and menus to control everything. All told, it only amounted to about one day of work. Finally, I used py2exe to make it into a portable application, so that it can be run on the computers on the scan room without having to worry about setting up a python environement.</p>
+<p>The tool is based entirely on <a href="http://www.swharden.com/blog/2013-05-08-realtime-data-plotting-in-python/">this excellent project</a>. All I did was modify the form, integrate the python serial library to get the sensor values from the Teensy over Serial, and add a couple of buttons and menus to control everything. All told, it only amounted to about one day of work. Finally, I used py2exe to make it into a portable application, so that it can be run on the computers on the scan room without having to worry about setting up a python environment.</p>
 <p>Here's an image of the finished monitoring tool in action.</p>
 <p><img alt="alt text" src="../..//images/monitoring_system.png" title="Monitoring System" /></p>
 <h3 id="setup">Setup</h3>
 <p>There are two ways to run the monitoring tool:</p>
 <ol>
 <li>
-<p>On windows you can run the pre-build exectutable: <a href="https://drive.google.com/file/d/0B9S2t7PTl3ecMmdWTXpJbzJ3Z1E/view?usp=sharing">monitoring_tool_win32_v1.0.zip</a></p>
+<p>On windows you can run the pre-built executable: <a href="https://drive.google.com/file/d/0B9S2t7PTl3ecMmdWTXpJbzJ3Z1E/view?usp=sharing">monitoring_tool_win32_v1.0.zip</a></p>
 </li>
 <li>
-<p>If that executable doesn't work, the full development environment I build this with can easily be installed. Just download <a href="https://code.google.com/p/pythonxy/">PythonXY</a>, download the the <a href="https://github.com/JoshBradshaw/Arterial-BP-MRI-Triggering-Unit/">source code</a>, navigate to the monitoring_tool directory in terminal and run the program with 
-{% highlight powershell %}
-$ python realtimePlot.py
-{% endhighlight %}</p>
+<p>If that executable doesn't work, the full development environment I build this with can easily be installed. Just download <a href="https://code.google.com/p/pythonxy/">PythonXY</a>, download the the <a href="https://github.com/JoshBradshaw/Arterial-BP-MRI-Triggering-Unit/">source code</a>, navigate to the monitoring_tool directory in terminal and run the program with </p>
+<p>$ python realtimePlot.py</p>
 </li>
 </ol>
+<p>NOTE: Mac OSX support has not been tested, but this program will most likely run fine on Macs as long as you run from source code (the pre-compiled binary will not work)</p>
 
             </div>
           </div>

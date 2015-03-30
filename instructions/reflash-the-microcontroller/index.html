@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Reflashing the Microcontroller - Arterial BP Triggering</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../../js/highlight.pack.js"></script>
+  <script src="../../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Arterial BP Triggering</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Instructions</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../user_manual">User Manual</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../guidelines-for-adapting-to-new-instrument">Guidelines for using a Different Pressure Measurement System</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Reflashing the Microcontroller</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#how-to-reflash-the-microcontroller">How to Reflash the Microcontroller</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Build Log</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../build_log/apb-triggering">Triggering Algorithm</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../build_log/set-adaptive-gain-algorithm">Gain Adjustment Algorithm</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../build_log/adaptive-gain-adjustment">Variable Gain Amplifier</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../build_log/gui-design">Monitoring Tool</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../build_log/pcb-design">PCB</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../build_log/testing-australian-data">Validation</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href="../.."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    <li>Reflashing the Microcontroller</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/JoshBradshaw/Arterial-BP-MRI-Triggering-Unit" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <h2 id="how-to-reflash-the-microcontroller">How to Reflash the Microcontroller</h2>
+<p>If for any reason the triggering unit stops working, or requires a software change, you will need to re-flash the Teensy microcontroller. </p>
+<p>To do so:</p>
+<p>Install Arduino: <a href="http://arduino.cc/en/Main/Software">http://arduino.cc/en/Main/Software</a> (I used version 1.6.1)</p>
+<p>Install TeensyDuino: <a href="https://www.pjrc.com/teensy/td_download.html">https://www.pjrc.com/teensy/td_download.html</a></p>
+<p>Connect the triggering unit to your computer's USB port.</p>
+<p>Open Windows Device manager and find the Teensy. You will typically find it under ports. </p>
+<p><img alt="" src="../..//images/device-manager.png" /></p>
+<p>Note down the COMPORT number (in this case its 15)</p>
+<p>Down the source code for the unit from github: <a href="https://github.com/JoshBradshaw/Arterial-BP-MRI-Triggering-Unit">Arterial-BP-MRI-Triggering-Unit</a></p>
+<p>Next open the Arduino software and open the pressure_trigger_module.ino sketch.</p>
+<p>Now you can push your changes to the Teensy microcontroller by pressing VERIFY and then UPLOAD.</p>
+<p>Usually this is all you have to do, but sometimes the Teensy requires a manual reset and the software will tell you so by giving you a red error message on the console. If that happens, open the aluminum case (theres a screwdriver that fits perfectly in my drawer) and press the little black button on the teensy board.</p>
+<p>If you need to modify my source code there to plenty of resources on the Arduino forum and the Teensy support forum. The language used to program the Arduino boards is essentially C++, without exceptions and other advanced features. </p>
+<p>Note: The contents of the ".ino" file are compiled differently from the .cpp and .h files. Arduino attempts to automatically generate the header file, and this can lead to difficult to understand compilation errors if you use features like classes in this particular source file. For this reason, I recommend putting nothing more than setup(), main() and very basic functions in the ".ino" file.</p>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../../build_log/apb-triggering" class="btn btn-neutral float-right" title="Triggering Algorithm"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../guidelines-for-adapting-to-new-instrument" class="btn btn-neutral" title="Guidelines for using a Different Pressure Measurement System"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../guidelines-for-adapting-to-new-instrument" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../../build_log/apb-triggering" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

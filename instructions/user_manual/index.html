@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Arterial BP Triggering</a>
+        <a href="../.." class="icon icon-home"> Arterial BP Triggering</a>
         
       </div>
 
@@ -66,6 +66,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../guidelines-for-adapting-to-new-instrument">Guidelines for using a Different Pressure Measurement System</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../reflash-the-microcontroller">Reflashing the Microcontroller</a>
                     
                 </li>
             
@@ -119,7 +124,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href="."></a>
+        <a href="../.."></a>
       </nav>
 
       
@@ -127,7 +132,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href=".">Docs</a> &raquo;</li>
+    <li><a href="../..">Docs</a> &raquo;</li>
     <li>User Manual</li>
       <li class="wy-breadcrumbs-aside">
         
@@ -152,6 +157,8 @@ To use it safely:</p>
 <li>At this point you can either use the BNC -&gt; S-video adapter that I made to connect to the Samba input, or a standard BNC cable to connect to the Transonic input.</li>
 <li>Follow steps 7-9 of the Samba instructions and test the device.</li>
 </ol>
+<p>The photo below illustrates the setup, as well as the correct positioning of the knobs on the function generator.</p>
+<p><img alt="" src="../..//images/test_setup.JPG" /></p>
 <h3 id="setup-for-samba-202-pressure-measurement-system">Setup for Samba 202 Pressure Measurement System</h3>
 <p>If this is your first time handling the Samba probes, take the time to read the relevant sections of the Samba user manual (included in the box). For invasive measurements you will require distiled and de-ionized water for cleaning the transducer tip, which you can obtain from the wet lab on the 8th floor of the Peter Gilgan Center for Research and Learning (the dispenser is a blue nozzle attached to the main sink). Sterile glassware is available in the hallway that separates the dry lab from the wet lab, you're free to take what you need as long as you return it to the same station for washing.</p>
 <ol>
@@ -163,10 +170,13 @@ To use it safely:</p>
 <li>Ensure that the INPUT SELECT toggle switch is in the left position (facing the SAMBA input connector).</li>
 <li>Use the 25ft RCA cable to connect the trigger unit to the external trigger input on the MRI scanner. The external trigger input is on the left side of the scanner, and is marked with a little arrow directed inwards.</li>
 <li>Plug the USB cable attached to the pressure trigger module to a computer. Ensure that the computer is plugged in (not just running on battery). This is important, because not all laptops maintain a steady 5V USB voltage when they're running on battery power.</li>
-<li>Launch "software-name-here.exe" on the computer.</li>
+<li>Launch "realtimePlot.exe" on the computer.</li>
 <li>Use the serial port selector (dropdown menu on bottom left corner) and choose the port called Teensy USB Serial.</li>
 <li>Press Start and watch to see whether the system is triggering as expected.</li>
 </ol>
+<p>The photo below illustrates most of the connections that you will need to make, as well as the screen that you should see when the Samba pressure measurement system is functioning properly.
+<img alt="" src="../..//images/samba_setup.JPG" /></p>
+<p>NOTE: The Samba sensors module is powered by USB, and has an internal battery. The battery should last for more than an hour of sustained used, but the unit is old enough that it can not be counted on. The easiest way to power the unit is via USB, (I searched many hardware stores for the DC jack that would fit the 5V input, with no success). A standard 2.5W (5V/500mA) USB power supply (which is the output of a standard computer, laptop or iPhone wall wart) does not provide enough power to keep the unit from running dead. Its possible that connecting the Samba device to a higher wattage USB power supply such as an iPad charger may keep it running steadily.</p>
 <h3 id="setup-for-transonic-ts420-perivascular-flow-module">Setup for Transonic TS420 Perivascular Flow Module</h3>
 <p>Note: I never actually had access to a TS420 during the design or testing of this instrument. I used the user manual of the device to get the relevant specifications and designed and tested the device based upon the manufacturer's description of its typical behavior. Thus, I can not guarantee that these instructions are complete, or that the device will work properly with the triggering system, especially if Transonic comes out with a new version.</p>
 <ol>
@@ -192,6 +202,8 @@ To use it safely:</p>
       
         <a href="../guidelines-for-adapting-to-new-instrument" class="btn btn-neutral float-right" title="Guidelines for using a Different Pressure Measurement System"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
+      
+        <a href="../.." class="btn btn-neutral" title="System Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -219,7 +231,7 @@ To use it safely:</p>
         
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
-      <span><a href="" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span><a href="../.." style="color: #fcfcfc;">&laquo; Previous</a></span>
       <span style="margin-left: 15px"><a href="../guidelines-for-adapting-to-new-instrument" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>

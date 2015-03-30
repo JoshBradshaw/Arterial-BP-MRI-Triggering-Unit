@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="../../instructions/user_manual" class="icon icon-home"> Arterial BP Triggering</a>
+        <a href="../.." class="icon icon-home"> Arterial BP Triggering</a>
         
       </div>
 
@@ -51,6 +51,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../../instructions/guidelines-for-adapting-to-new-instrument">Guidelines for using a Different Pressure Measurement System</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../instructions/reflash-the-microcontroller">Reflashing the Microcontroller</a>
                     
                 </li>
             
@@ -115,7 +120,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href="../../instructions/user_manual"></a>
+        <a href="../.."></a>
       </nav>
 
       
@@ -123,7 +128,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../../instructions/user_manual">Docs</a> &raquo;</li>
+    <li><a href="../..">Docs</a> &raquo;</li>
     <li>Variable Gain Amplifier</li>
       <li class="wy-breadcrumbs-aside">
         
@@ -138,13 +143,13 @@
           <div role="main">
             <div class="section">
               <h2 id="variable-gain-amplifier-with-spi-interface">Variable Gain Amplifier with SPI Interface</h2>
-<p>A major problem with triggering off of the fetal blood pressures is that the signal coming from the transducers is relatively small compared to the full scale of the pressure measurement instrument (numbers given below in specifications). To resolve this issue, I considered three possible solutions:</p>
+<p>A major problem with triggering from fetal blood pressures is that the signal coming from the transducers is relatively small compared to the full scale of the pressure measurement instrument (numbers given below in specifications). To resolve this issue, I considered three possible solutions:</p>
 <ol>
 <li>Use an analog potentiometer in the gain feedback path, which the experimenter can adjust by turning a knob.</li>
 <li>Use a digital potentiometer in the feedback path which the experimenter can adjust by pressing increment and decrement buttons.</li>
 <li>Use a digital potentiometer in the gain feedback path which is automatically adjusted by the microcontroller whenever the signal level is out of range.</li>
 </ol>
-<p>After due consideration, I opted to use strategy #3. Having the microcontroller perform the adjustment is advantageous because the microntroller can adjust the gain smoothly and gradually over a period of one minute or more, which will ensure that the gain adjustments do not interfere with the constantly running triggering algorithm.</p>
+<p>After due consideration, I opted to use strategy #3. Having the microcontroller perform the adjustment is advantageous because the microntroller can adjust the gain smoothly and gradually over a period of several seconds, which will ensure that the gain adjustments do not interfere with the constantly running triggering algorithm.</p>
 <h3 id="specifications">Specifications</h3>
 <ul>
 <li>The Samba Sensor can measure pressures from -38 mmHg to 263 mmHg, which is linearly mapped to a 0-5V output</li>
@@ -159,8 +164,7 @@
 <p>I started by patching up a simple non-inverting amplifier, on a breadboard like so:</p>
 <p><img src="../..//images/gain_adjust_amplifier.JPG" alt="Slope Sum function applied to blood pressure waveform" style="width: 600px;"/></p>
 <p>This amplifier had an adjustable gain range of 1.1 V/V to 11 V/V with 256 subdivisions. This is more than enough gain to amplify a 70/30 mmHg signal to the full range of the ADC.</p>
-<p>With that all patched up and working, all that remains is to write an efficient algorithm for bringing the signal into full range in real time.</p>
-<p>The algorithm development is documented in this post:</p>
+<p>With that all patched up and working, all that remains is to write an efficient algorithm for bringing the signal into full range in real time. The software implementation process is described in the post: <em>Gain Adjustment Algorithm</em>.</p>
 
             </div>
           </div>

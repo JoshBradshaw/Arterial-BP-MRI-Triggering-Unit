@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="instructions/user_manual/" class="icon icon-home"> Arterial BP Triggering</a>
+        <a href="." class="icon icon-home"> Arterial BP Triggering</a>
         
       </div>
 
@@ -51,6 +51,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="instructions/guidelines-for-adapting-to-new-instrument/">Guidelines for using a Different Pressure Measurement System</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instructions/reflash-the-microcontroller/">Reflashing the Microcontroller</a>
                     
                 </li>
             
@@ -104,7 +109,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href="instructions/user_manual/"></a>
+        <a href="."></a>
       </nav>
 
       
@@ -112,7 +117,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="instructions/user_manual/">Docs</a> &raquo;</li>
+    <li><a href=".">Docs</a> &raquo;</li>
     <li>System Overview</li>
       <li class="wy-breadcrumbs-aside">
         
@@ -127,9 +132,17 @@
           <div role="main">
             <div class="section">
               <h2 id="system-overview">System Overview</h2>
+<style>
+td { 
+  border: solid;
+  border-width: 1px 1px;
+  padding: 5px;
+}
+</style>
+
 <p>The Arterial Blood Pressure Triggering System is an open source tool developed at SickKids. The system converts a blood pressure signal into a TTL signal, as illustrated below.</p>
 <p><img alt="alt text" src=".//images/bp_vs_ttl.jpg" title="illustration of how the triggering system transforms blood pressure signal into TTL signal" /></p>
-<p>This is useful for situations in which a triggering signal is required to correct for pulsatile flow or cardiac motion, but the standard clinical ECG or pulse oximeter based triggering systems can not be used. The original application of this system was to provide a retrospective gating signal during 4DFlow and phase contrast scans on prenatal Yorkshire pig fetus's hearts. During the experiments, the fetal pigs blood pressure was monitored using an invasive Samba flow probe in the carotid artery. TODO: INSERT SOME IMAGES</p>
+<p>This is useful for situations in which a gating signal is required to correct for pulsatile flow or cardiac motion, but the standard clinical ECG or pulse oximeter based triggering systems can not be used. The original application of this system was to provide a retrospective gating signal during 4DFlow and phase contrast scans on prenatal Yorkshire pig fetus's hearts. During the experiments, the fetal pigs blood pressure was monitored using an invasive Samba flow probe in the carotid artery.</p>
 <h3 id="key-features">Key Features</h3>
 <ul>
 <li>Compatible with <a href="http://www.transonic.com/products/research/product/t402t403-multi-channel-research-consoles/">Transonic</a> and Samba Sensors pressure measurement modules, and can easily be adapted to work with most other pressure measurement instruments</li>
@@ -144,38 +157,29 @@
 <p><img alt="alt text" src=".//images/finished_build.JPG" title="triggering unit photo" /></p>
 <p>The connections on the front panel of the triggering unit are:</p>
 <table>
-<thead>
-<tr>
-<th>Samba Sensor Input (s-video)</th>
-<th>Transonic Sensor Input (BNC)</th>
-<th>External Trigger Out (RCA)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Input Selection Switch</td>
-<td></td>
-<td>Trigger Status LED</td>
-</tr>
-</tbody>
+    <tr>
+        <td>Samba Sensor Input (s-video)</td>
+        <td>Transonic Sensor Input (BNC)</td>
+        <td>External Trigger Out (RCA)</td>
+    </tr>
+    <tr>
+        <td>Input Selection Switch</td>
+        <td></td>
+        <td>Trigger Status LED</td>
+    </tr>
 </table>
-<p>Finally, a USB cable runs out of the back corner of the unit. This cable is connected to a computer to power the unit, and optionally to transfer the blood pressure readings to the monitoring software.</p>
-<p>For more information about the hardware design see:</p>
-<ol>
-<li>Circuit design TODO: finish writing page</li>
-<li>PCB Design TODO: finish writing page</li>
-<li>Assembly</li>
-<li>Triggering algorithm design</li>
-</ol>
+
+<p><br />
+Finally, a USB cable runs out of the back corner of the unit. This cable is connected to a computer to power the unit, and optionally to transfer the blood pressure readings to the monitoring software.</p>
 <h2 id="monitoring-software">Monitoring Software</h2>
 <p><img alt="alt text" src=".//images/monitoring_system.png" title="triggering unit photo" /></p>
-<p>The monitoring software is not required to use the triggering unit, but it is very useful. The top chart animation shows the input signal from the pressure catheter, and the bottom chart animation shows the triggering signal that's been sent to the scanner. These charts are updated in real-time with &lt;20ms of delay, so you'll be aware of any irregular heartbeats, or problems with the pressure catheter, right as they happen. Every run of the triggering unit is logged with time and date stamps, so it can be compared with the MRI data in post processing if required.</p>
+<p>The monitoring tool give the experimenter real-time feedback on the pressure catheter and the triggering signal. The top chart animation shows the input signal from the pressure catheter, and the bottom chart animation shows the triggering signal that's been sent to the scanner. These charts are updated in real-time with &lt;20ms of delay, so you'll be aware of any irregular heartbeats, or problems with the pressure catheter, right as they happen. Every run of the triggering unit is logged with time and date stamps, so it can be compared with the MRI data in post processing if required.</p>
 <p>For more information about the monitoring software see:
 1. Monitoring software design</p>
 <h3 id="scanner-compatibility">Scanner compatibility</h3>
 <p>The SickKids research MRI scanner is the Siemens Magnetom Trio with a field strength of 3T, so the triggering unit's TTL output is calibrated to meet or exceed all of the parameters given in Siemen's timing diagram (taken from the latest version of the Magnetom Trio operating manual). The TTL pulses sent by the unit are 20ms in duration at 3.3V, which should be sufficient for most MRI scanners.</p>
 <h3 id="how-to-aquire-a-unit">How to aquire a unit</h3>
-<p>So far only two of these units have been built, and they were both hand assembled. If you're moderately competant with software and electronics you can build one yourself using the schematics and this tutuorial.</p>
+<p>So far only two of these units have been built, and they were both hand assembled. If you're moderately competant with software and electronics you can build one yourself using the schematics. The parts are listed in the schematics directory, and all of the components are avaialble from digikey. For the PCB board, I may be able to provide you one of my spares. Failing that, you can easily send the GERBER files to any circuit board manufacturer to have them assembled.</p>
 <p>Feel free to email me at joshbradshaw11@gmail.com if you are interested in adapting this unit to work with a different blood pressure instrument, or want to commision me to build one for you.</p>
 
             </div>
@@ -184,10 +188,8 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="build_log/apb-triggering/" class="btn btn-neutral float-right" title="Triggering Algorithm"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="instructions/user_manual/" class="btn btn-neutral float-right" title="User Manual"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
-      
-        <a href="instructions/guidelines-for-adapting-to-new-instrument/" class="btn btn-neutral" title="Guidelines for using a Different Pressure Measurement System"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -215,8 +217,8 @@
         
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
-      <span><a href="instructions/guidelines-for-adapting-to-new-instrument/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="build_log/apb-triggering/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="instructions/user_manual/" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>
 </body>
