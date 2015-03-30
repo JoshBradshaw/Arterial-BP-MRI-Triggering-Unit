@@ -3,7 +3,7 @@
 
 const int BUFFER_LEN = 10; // determines how many samples will be stored at a time
 const int REFRACTORY_PERIOD = 45; // 45 cycles at 250Hz gives max heart reate of 333 BPM
-const int THRESHOLD_RESET_PERIOD = 500; // reset magnitude thresholds after 2.4 seconds without heartbeat
+const int THRESHOLD_RESET_PERIOD = 1000; // reset magnitude thresholds after 2.4 seconds without heartbeat
 
 class circularBuffer {
     // old items overwrite new items
