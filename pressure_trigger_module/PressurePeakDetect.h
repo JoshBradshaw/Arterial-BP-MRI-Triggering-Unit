@@ -2,6 +2,8 @@
 #define __PRESSUREPEAKDETECTH__
 
 const int BUFFER_LEN = 10; // determines how many samples will be stored at a time
+const int REFRACTORY_PERIOD = 45; // 45 cycles at 250Hz gives max heart reate of 333 BPM
+const int THRESHOLD_RESET_PERIOD = 500; // reset magnitude thresholds after 2.4 seconds without heartbeat
 
 class circularBuffer {
     // old items overwrite new items
@@ -43,25 +45,25 @@ public:
 };
 
 
-//Low pass chebyshev filter order=1 alpha1=0.2 
+//Low pass chebyshev filter order=1 alpha1=0.2
 class filter
 {
-	public:
-		filter()
-		{
-			v[0]=0;
-			v[1]=0;
-		}
-	private:
-		int v[2];
-	public:
-		int step(int x)
-		{
-			int tmp = v[0];
-                        v[0] = v[1];
-                        v[1] = x;
-                        return (tmp + v[0] + v[1]) / 3; 
-		}
+public:
+    filter()
+    {
+        v[0]=0;
+        v[1]=0;
+    }
+private:
+    volatile int v[2];
+public:
+    int step(int x)
+    {
+        int tmp = v[0];
+        v[0] = v[1];
+        v[1] = x;
+        return (tmp + v[0] + v[1]) / 3;
+    }
 };
 
 class slopesum {
@@ -70,7 +72,7 @@ class slopesum {
 public:
     slopesum(void) {}
 private:
-    int slope_sum = 0;
+    volatile int slope_sum = 0;
     circularBuffer sampleBuffer; // filtered samples
 public:
     int step(const int x) {
@@ -78,7 +80,7 @@ public:
         // slopes. we just subtract the contribution of the one we're taking away, and add
         // the contribution of the one we're adding
         int old_slope = sampleBuffer[1] - sampleBuffer[0];
-        
+
         if (old_slope > 0) {
             slope_sum -= old_slope;
         }
@@ -95,9 +97,9 @@ public:
 };
 
 class peakDetect {
-    // peak detection state machine
-    // state 0: rising
-    // state 1: refractory period
+// peak detection state machine
+// state 0: rising
+// state 1: refractory period
 
 public:
     peakDetect() {}
@@ -112,31 +114,43 @@ private:
     volatile int rp_counter = 0;
     volatile int peak_threshold = 0;
     volatile int peak_threshold_sum = 0;
-    
-    int peak1 = 0;
-    int peak2 = 0;
-    int peak3 = 0;
-    int peak4 = 0;
-    int peak5 = 0;
-    int peak6 = 0;
+
+    volatile int peak1 = 0;
+    volatile int peak2 = 0;
+    volatile int peak3 = 0;
+    volatile int peak4 = 0;
+    volatile int peak5 = 0;
+    volatile int peak6 = 0;
 
 public:
-    void updatePeakThreshold(int newPeakVal) {
+    void updatePeakThreshold(const int newPeakVal) {
         // peak threshold averaged over the last BUFFER_LEN peaks
         // averaging over more peaks makes reduces sensitivity to amplitude spikes
         // thresholds are set at ~1/3 of the average amplitude, because testing showed
         // that they don't need to be very high
         peak_threshold_sum -= peak1;
         peak_threshold_sum += newPeakVal;
-        
+
         peak1 = peak2;
         peak2 = peak3;
         peak3 = peak4;
         peak4 = peak5;
         peak5 = peak6;
         peak6 = newPeakVal;
-        
+        // set the threshold to about 1/2
         peak_threshold = peak_threshold_sum / 12;
+    }
+
+    void resetPeakThreshold() {
+        // if threshold becomes too high, it must timeout and reset
+        peak_threshold_sum = 0;
+        peak_threshold = 0;
+        peak1 = 0;
+        peak2 = 0;
+        peak3 = 0;
+        peak4 = 0;
+        peak5 = 0;
+        peak6 = 0;
     }
 
     void updateMovingAverages() {
@@ -159,25 +173,16 @@ public:
             return(true);
         }
 
-        if (!rising && rp_counter >= refractory_period 
-        && right_moving_sum > peak_threshold
-        && left_moving_sum < right_moving_sum) {
+        // enter rising state if refractory period over, slope is trending upwards, and above peak threshold
+        if (!rising && rp_counter >= refractory_period
+                && right_moving_sum > peak_threshold
+                && left_moving_sum < right_moving_sum) {
             rising = true;
+        } else if (rp_counter > THRESHOLD_RESET_PERIOD) {
+            rp_counter += 1;
+            resetPeakThreshold();            
         } else {
             rp_counter += 1;
-            
-            // reset threshold if too much time has passed
-            if (rp_counter > 350) {
-              peak_threshold_sum = 0;
-              peak_threshold = 0;
-              peak1 = 0;
-              peak2 = 0;
-              peak3 = 0;
-              peak4 = 0;
-              peak5 = 0;
-              peak6 = 0;
-              
-            }
         }
         return(false);
     }

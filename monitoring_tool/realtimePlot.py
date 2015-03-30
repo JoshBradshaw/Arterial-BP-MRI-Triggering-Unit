@@ -34,13 +34,10 @@ gui.setupUi(win_plot)
 gui.bpPlot.setAxisScale(0, 0, 5, 5)
 gui.bpPlot.setAxisScale(1, 0, 4, 4)
 gui.bpPlot.setAxisTitle(0, "BP Signal (V)")
-gui.ssfPlot.setAxisScale(0, 0, 10, 10)
+gui.ssfPlot.setAxisScale(0, 0, 5, 5)
 gui.ssfPlot.setAxisScale(1, 0, 4, 4)
 gui.ssfPlot.setAxisTitle(0, "BP Signal (V)")
-gui.triggerPlot.setAxisScale(0, 0, 1, 1)
-gui.triggerPlot.setAxisMaxMinor(0, 1)
-gui.triggerPlot.setAxisTitle(0, "Logic Level")
-gui.triggerPlot.setCanvasBackground(Qt.Qt.black)
+
 # times the plot refresh
 gui.timer = QtCore.QTimer()
 # line on blood pressure graph
@@ -64,10 +61,11 @@ trigger_curve.setPaintAttribute(Qwt.QwtPlotCurve.ClipPolygons, True)
 sympen = Qt.QPen(Qt.Qt.red)
 sympen.setWidth(5)
 trigger_curve.setStyle(-1)
-trigger_curve.setSymbol(Qwt.QwtSymbol(Qwt.QwtSymbol. DTriangle,
+# make the heart beats appear as little red triangles
+trigger_curve.setSymbol(Qwt.QwtSymbol(Qwt.QwtSymbol.VLine,
                                       Qt.QBrush(),
                                       sympen,
-                                      Qt.QSize(10, 10)))
+                                      Qt.QSize(7, 7)))
 trigger_curve.setPen(Qt.QPen(Qt.Qt.red))
 
 # if its a windows 7 machine clean up the blinkyness by running anti aliasing
@@ -182,14 +180,13 @@ class plotData(object):
             self.ts[self.last_point] = sampleval / SIXTEEN_BIT_TO_COUNTS
             self.trigger = False
         else:
-            self.ts[self.last_point] = -1
+            self.ts[self.last_point] = -1 # -1 will place these points outside the plot's viewable area
         # log the sample
         logger.info("{}: {} {}".format(datetime.now().strftime('%Y-%m-%d-%H-%M-%f'), self.ys[self.last_point], self.ts[self.last_point]))
         # redraw the lines (note this is really inefficient, redrawing a dirty rectangle only would be much faster)
         bp_curve.setData(self.xs, self.ys)
         gui.bpPlot.replot() 
         trigger_curve.setData(self.xs, self.ts+0.3)
-        gui.triggerPlot.replot()
         ssf_curve.setData(self.xs, self.ss)
         gui.ssfPlot.replot()
 

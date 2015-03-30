@@ -37,13 +37,13 @@ int TARGET_AMPLITUDE; // ~2.67 V from the noninverting amplifier
 const int MAX_SIGNAL_AMPLITUDE = 55000; // ~4.20 V from the noninverting amplifier
 // number of potentiomter codes to correct by if signal is out of range
 // a higher number results in a faster correction
-const int CORRECTION = 2;
+const int CORRECTION = 3;
 
 volatile int potentiometerValue = 0; // range 0-256 where 0 -> ~84 ohms and 256 -> ~50 k-ohms
 // if gain is being shifted up or down, this gives the stopping value
 volatile int targetPotentiometerValue = potentiometerValue;
 
-const int WINDOW_PERIOD = 50; // 50 x 100ms = 5s
+const int WINDOW_PERIOD = 45; // 50 x 100ms = 5s
 volatile int windowCount = 0; // gain is adjusted when windowCount exceeds WINDOW PERIOD
 
 volatile bool minExceeded = false;
@@ -75,7 +75,7 @@ void setupGainAdjustment() {
         MIN_SIGNAL_AMPLITUDE = 40000;
         TARGET_AMPLITUDE = 47000;
     } else {
-        GAIN_POT = 3; // samba
+        GAIN_POT = 3; // samba signal pathway
         TARGET_AMPLITUDE = 35000;
         MIN_SIGNAL_AMPLITUDE = 40000;
     }
