@@ -7,7 +7,7 @@ IntervalTimer sampletimer;
 // written for Teensy 3.1 running at 96 MHz
 
 const int SAMPLING_PERIOD = 4; // milliseconds
-const int TRIGGER_PULSE_DURATION = 20; // milliseconds
+const int TRIGGER_PULSE_DURATION = 10; // milliseconds
 const int SCANNER_TRIGGER_PIN = 19;
 const int LED_PIN = 18;
 
@@ -85,7 +85,7 @@ void sample() {
     if (sampleSendCount < SAMPLE_SEND_PERIOD) {
         sampleSendCount += 1;
     } else {
-        Serial.printf("%d %d\n", sampleVal, triggerPulseHigh);
+        Serial.printf("%d %d %d\n", sampleVal, ssfVal, triggerPulseHigh);
         sampleSendCount = 0;
     }
 }
