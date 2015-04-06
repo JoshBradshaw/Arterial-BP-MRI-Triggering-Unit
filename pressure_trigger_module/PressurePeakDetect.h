@@ -1,8 +1,7 @@
 #ifndef __PRESSUREPEAKDETECTH__
 #define __PRESSUREPEAKDETECTH__
 
-const int BUFFER_LEN = 10; // determines how many samples will be stored at a time
-const int REFRACTORY_PERIOD = 45; // 45 cycles at 250Hz gives max heart reate of 333 BPM
+const int BUFFER_LEN = 15; // determines how many samples will be stored at a time
 const int THRESHOLD_RESET_PERIOD = 1000; // reset magnitude thresholds after 2.4 seconds without heartbeat
 
 class circularBuffer {
@@ -110,7 +109,7 @@ private:
     volatile bool rising = true;
     volatile int left_moving_sum = 0;
     volatile int right_moving_sum = 0;
-    volatile int refractory_period = 50; // 40 samples at 250Hz = 160ms which gives 375BPM maximum heart rate
+    volatile int refractory_period = 45; // 40 samples at 250Hz = 160ms which gives 375BPM maximum heart rate
     volatile int rp_counter = 0;
     volatile int peak_threshold = 0;
     volatile int peak_threshold_sum = 0;
@@ -138,7 +137,7 @@ public:
         peak5 = peak6;
         peak6 = newPeakVal;
         // set the threshold to about 1/2
-        peak_threshold = peak_threshold_sum / 12;
+        peak_threshold = peak_threshold_sum / 9;
     }
 
     void resetPeakThreshold() {
@@ -169,14 +168,14 @@ public:
         if (rising && left_moving_sum > right_moving_sum) {
             updatePeakThreshold(left_moving_sum);
             rising = false;
-            rp_counter = 0;
-            return(true);
+            if(rp_counter > refractory_period){
+              rp_counter = 0;
+              return(true);
+            }
         }
 
         // enter rising state if refractory period over, slope is trending upwards, and above peak threshold
-        if (!rising && rp_counter >= refractory_period
-                && right_moving_sum > peak_threshold
-                && left_moving_sum < right_moving_sum) {
+        if (!rising && right_moving_sum > peak_threshold && left_moving_sum < right_moving_sum) {
             rising = true;
         } else if (rp_counter > THRESHOLD_RESET_PERIOD) {
             rp_counter += 1;
