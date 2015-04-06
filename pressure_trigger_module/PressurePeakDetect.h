@@ -1,7 +1,7 @@
 #ifndef __PRESSUREPEAKDETECTH__
 #define __PRESSUREPEAKDETECTH__
 
-const int BUFFER_LEN = 12; // determines how many samples will be stored at a time
+const int BUFFER_LEN = 15; // determines how many samples will be stored at a time
 const int THRESHOLD_RESET_PERIOD = 1000; // reset magnitude thresholds after 2.4 seconds without heartbeat
 
 class circularBuffer {
@@ -47,16 +47,21 @@ public:
 //Low pass chebyshev filter order=1 alpha1=0.2
 class filter
 {
-private:
-    volatile int x_n_1 = 0;
-    volatile int y_n_1 = 0;
 public:
-    int step(const int x_n)
+    filter()
     {
-        int y_n = (x_n/20) + (x_n_1/20) + 9*y_n_1/10;
-        x_n_1 = x_n;
-        y_n_1 = y_n;
-        return(y_n);
+        v[0]=0;
+        v[1]=0;
+    }
+private:
+    volatile int v[2];
+public:
+    int step(int x)
+    {
+        int tmp = v[0];
+        v[0] = v[1];
+        v[1] = x;
+        return (tmp + v[0] + v[1]) / 3;
     }
 };
 
@@ -104,7 +109,7 @@ private:
     volatile bool rising = true;
     volatile int left_moving_sum = 0;
     volatile int right_moving_sum = 0;
-    volatile int refractory_period = 30; // 40 samples at 250Hz = 160ms which gives 375BPM maximum heart rate
+    volatile int refractory_period = 45; // 40 samples at 250Hz = 160ms which gives 375BPM maximum heart rate
     volatile int rp_counter = 0;
     volatile int peak_threshold = 0;
     volatile int peak_threshold_sum = 0;
@@ -132,7 +137,7 @@ public:
         peak5 = peak6;
         peak6 = newPeakVal;
         // set the threshold to about 1/2
-        peak_threshold = peak_threshold_sum / 14;
+        peak_threshold = peak_threshold_sum / 9;
     }
 
     void resetPeakThreshold() {
@@ -159,26 +164,20 @@ public:
     bool isPeak(const int x) {
         sb.addSample(x);
         updateMovingAverages();
-        
-        bool positive_slope = left_moving_sum < right_moving_sum;
-        bool above_threshold = right_moving_sum > peak_threshold;
-        bool refractory_period_over = rp_counter > refractory_period;
-        
-        if (rising && !positive_slope) {
+
+        if (rising && left_moving_sum > right_moving_sum) {
             updatePeakThreshold(left_moving_sum);
             rising = false;
-            if(refractory_period_over) {
-                rp_counter = 0;
-                return(true);
+            if(rp_counter > refractory_period){
+              rp_counter = 0;
+              return(true);
             }
         }
 
         // enter rising state if refractory period over, slope is trending upwards, and above peak threshold
-        if (!rising && positive_slope && above_threshold) {
+        if (!rising && right_moving_sum > peak_threshold && left_moving_sum < right_moving_sum) {
             rising = true;
-        } 
-        // after a prolonged period of not detecting any peaks, reset the threshold
-        else if (rp_counter > THRESHOLD_RESET_PERIOD) {
+        } else if (rp_counter > THRESHOLD_RESET_PERIOD) {
             rp_counter += 1;
             resetPeakThreshold();            
         } else {
