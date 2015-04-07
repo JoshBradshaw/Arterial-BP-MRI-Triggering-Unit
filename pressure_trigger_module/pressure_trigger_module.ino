@@ -23,8 +23,8 @@ volatile int serial_update_count = 0;
 const int SAMPLE_SEND_PERIOD = 3;
 volatile int sampleSendCount = 0;
 
-filter filt;
-slopesum ssf;
+lowPassFilter filt;
+slopeSumFilter ssf;
 peakDetect pd;
 
 void setup() {

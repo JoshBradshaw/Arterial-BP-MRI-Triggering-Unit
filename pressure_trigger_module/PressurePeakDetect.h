@@ -4,13 +4,14 @@
 const int BUFFER_LEN = 15; // determines how many samples will be stored at a time
 const int PEAK_BUFFER_LEN = 5;
 const int THRESHOLD_RESET_PERIOD = 1000; // reset magnitude thresholds after 2.4 seconds without heartbeat
-const int ROLLING_POINT_SPACING = 4;
+const int ROLLING_POINT_SPACING = 2;
+const int REFRACTORY_PERIOD = 45; // 40 samples at 250Hz = 160ms which gives 375BPM maximum heart rate
 
-class circularBuffer {
+class ringBuffer {
     // old items overwrite new items
     // item 0 is the oldest, item BUFFER_LEN -1 is the newest
 public:
-    circularBuffer() {
+    ringBuffer() {
         // initialize to all zeros, so that the moving averages on sames initialize to reasonable values
         for(int ii=0; ii < BUFFER_LEN; ii++) {
             addSample(0);
@@ -24,12 +25,7 @@ private:
 public:
     volatile int& operator[] (const int nIndex) {
         // python style indexing, negative indices count back from the end
-        if (nIndex > -1)  {
-            return buff[(first + nIndex)%BUFFER_LEN];
-        }
-        else {
-            return buff[(first + validItems + nIndex)%BUFFER_LEN];
-        }
+        return buff[(first + validItems + nIndex)%BUFFER_LEN];
     }
     void addSample(const int newSample) {
         // add samples until array full, then begin overwriting oldest
@@ -45,9 +41,8 @@ public:
     }
 };
 
-
 //Low pass chebyshev filter order=1 alpha1=0.2
-class filter {
+class lowPassFilter {
 private:
     int x_n_1 = 0;
     int y_n_1 = 0;
@@ -60,14 +55,14 @@ public:
     }
 };
 
-class slopesum {
+class slopeSumFilter {
     // taken from MIT, this filter excentuates the first rising edge
     // of the signal, and removes the secondary knee
 public:
-    slopesum(void) {}
+    slopeSumFilter(void) {}
 private:
     volatile int slope_sum = 0;
-    circularBuffer sampleBuffer; // filtered samples
+    ringBuffer sampleBuffer; // filtered samples
 public:
     int step(const int x) {
         // the result of this recursive calculation is equivilant to adding all of the positive
@@ -91,40 +86,33 @@ public:
 };
 
 class peakDetect {
-// peak detection state machine
-// state 0: rising
-// state 1: refractory period
-
 public:
     peakDetect() {}
 private:
-    circularBuffer sb; // ssf samples
-    circularBuffer pb; // peak values
+    ringBuffer sb; // ssf samples
+    ringBuffer pb; // peak values
 
     volatile bool rising = true;
-    volatile int left_moving_sum = 0;
-    volatile int right_moving_sum = 0;
-    volatile int refractory_period = 45; // 40 samples at 250Hz = 160ms which gives 375BPM maximum heart rate
     volatile int rp_counter = 0;
     
     volatile int peakSum = 0;
     volatile int peakThreshold = 0;
-
 public:
-     bool isPeak(const int x_n) {
-        sb.addSample(x_n);
-        int x_n_1 = sb[BUFFER_LEN - ROLLING_POINT_SPACING];
+     bool isPeak(const int x) {
+        sb.addSample(x);
+        int lrs = sb[BUFFER_LEN - ROLLING_POINT_SPACING] + sb[BUFFER_LEN - ROLLING_POINT_SPACING -1];
+        int rrs = sb[BUFFER_LEN - 1] + x;
 
-        if (rising && x_n_1 > x_n) {
-            updatePeakThreshold(left_moving_sum);
+        if (rising && lrs > rrs) {
+            updatePeakThreshold(lrs);
             rising = false;
-            if(rp_counter > refractory_period){
+            if(rp_counter > REFRACTORY_PERIOD){
               rp_counter = 0;
               return(true);
             }
         }
         // enter rising state if refractory period over, slope is trending upwards, and above peak threshold
-        if (!rising && x_n > peakThreshold && x_n_1 < x_n) {
+        if (!rising && lrs > peakThreshold && lrs < rrs) {
             rising = true;
         } else if (rp_counter > THRESHOLD_RESET_PERIOD) {
             rp_counter += 1;
@@ -139,7 +127,7 @@ public:
         peakSum += newPeakVal;
         peakSum -= pb[BUFFER_LEN - PEAK_BUFFER_LEN];
         pb.addSample(newPeakVal);
-        peakThreshold = peakSum / (2 * PEAK_BUFFER_LEN);
+        peakThreshold = peakSum / (3 * PEAK_BUFFER_LEN / 2);
     }
 
     void resetPeakThreshold() {
