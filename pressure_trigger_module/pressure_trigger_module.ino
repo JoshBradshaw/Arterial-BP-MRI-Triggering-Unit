@@ -20,7 +20,7 @@ volatile bool triggerPulseHigh = false;
 
 volatile int ANALOG_INPUT_PIN; // set at startup depending on switch position
 volatile int serial_update_count = 0;
-const int SAMPLE_SEND_PERIOD = 3;
+const int SAMPLE_SEND_PERIOD = 2;
 volatile int sampleSendCount = 0;
 
 filter filt;
@@ -85,7 +85,7 @@ void sample() {
     if (sampleSendCount < SAMPLE_SEND_PERIOD) {
         sampleSendCount += 1;
     } else {
-        Serial.printf("%d %d %d\n", sampleVal, ssfVal, triggerPulseHigh);
+        Serial.printf("%d %d\n", ssfVal, triggerPulseHigh);
         sampleSendCount = 0;
     }
 }

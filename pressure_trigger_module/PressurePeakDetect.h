@@ -47,21 +47,16 @@ public:
 //Low pass chebyshev filter order=1 alpha1=0.2
 class filter
 {
-public:
-    filter()
-    {
-        v[0]=0;
-        v[1]=0;
-    }
 private:
-    volatile int v[2];
+    int x_n_1 = 0;
+    int y_n_1 = 0;
 public:
-    int step(int x)
+    int step(int x_n)
     {
-        int tmp = v[0];
-        v[0] = v[1];
-        v[1] = x;
-        return (tmp + v[0] + v[1]) / 3;
+        int y_n = (x_n/20) + (x_n_1/20) + 9*y_n_1/10;
+        x_n_1 = x_n;
+        y_n_1 = y_n;
+        return(y_n);
     }
 };
 
