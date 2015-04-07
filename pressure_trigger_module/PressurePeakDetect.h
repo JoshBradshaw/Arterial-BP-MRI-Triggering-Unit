@@ -4,6 +4,7 @@
 const int BUFFER_LEN = 15; // determines how many samples will be stored at a time
 const int PEAK_BUFFER_LEN = 5;
 const int THRESHOLD_RESET_PERIOD = 1000; // reset magnitude thresholds after 2.4 seconds without heartbeat
+const int ROLLING_POINT_SPACING = 4;
 
 class circularBuffer {
     // old items overwrite new items
@@ -110,6 +111,30 @@ private:
     volatile int peakThreshold = 0;
 
 public:
+     bool isPeak(const int x_n) {
+        sb.addSample(x_n);
+        int x_n_1 = sb[BUFFER_LEN - ROLLING_POINT_SPACING];
+
+        if (rising && x_n_1 > x_n) {
+            updatePeakThreshold(left_moving_sum);
+            rising = false;
+            if(rp_counter > refractory_period){
+              rp_counter = 0;
+              return(true);
+            }
+        }
+        // enter rising state if refractory period over, slope is trending upwards, and above peak threshold
+        if (!rising && x_n > peakThreshold && x_n_1 < x_n) {
+            rising = true;
+        } else if (rp_counter > THRESHOLD_RESET_PERIOD) {
+            rp_counter += 1;
+            resetPeakThreshold();            
+        } else {
+            rp_counter += 1;
+        }
+        return(false);
+    }
+
     void updatePeakThreshold(const int newPeakVal) {
         peakSum += newPeakVal;
         peakSum -= pb[BUFFER_LEN - PEAK_BUFFER_LEN];
@@ -123,40 +148,6 @@ public:
         for(int ii=BUFFER_LEN - PEAK_BUFFER_LEN; ii<PEAK_BUFFER_LEN; ii++){
             pb[ii] = 0;
         }
-    }
-
-    void updateMovingAverages() {
-        // update right moving average
-        right_moving_sum += sb[-1];
-        right_moving_sum -= sb[-2];
-        // update left moving average
-        left_moving_sum += sb[-5];
-        left_moving_sum -= sb[-6];
-    }
-
-    bool isPeak(const int x) {
-        sb.addSample(x);
-        updateMovingAverages();
-
-        if (rising && left_moving_sum > right_moving_sum) {
-            updatePeakThreshold(left_moving_sum);
-            rising = false;
-            if(rp_counter > refractory_period){
-              rp_counter = 0;
-              return(true);
-            }
-        }
-
-        // enter rising state if refractory period over, slope is trending upwards, and above peak threshold
-        if (!rising && right_moving_sum > peakThreshold && left_moving_sum < right_moving_sum) {
-            rising = true;
-        } else if (rp_counter > THRESHOLD_RESET_PERIOD) {
-            rp_counter += 1;
-            resetPeakThreshold();            
-        } else {
-            rp_counter += 1;
-        }
-        return(false);
     }
 };
 
