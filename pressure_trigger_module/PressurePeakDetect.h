@@ -2,6 +2,7 @@
 #define __PRESSUREPEAKDETECTH__
 
 const int BUFFER_LEN = 15; // determines how many samples will be stored at a time
+const int PEAK_BUFFER_LEN = 5;
 const int THRESHOLD_RESET_PERIOD = 1000; // reset magnitude thresholds after 2.4 seconds without heartbeat
 
 class circularBuffer {
@@ -45,23 +46,16 @@ public:
 
 
 //Low pass chebyshev filter order=1 alpha1=0.2
-class filter
-{
-public:
-    filter()
-    {
-        v[0]=0;
-        v[1]=0;
-    }
+class filter {
 private:
-    volatile int v[2];
+    int x_n_1 = 0;
+    int y_n_1 = 0;
 public:
-    int step(int x)
-    {
-        int tmp = v[0];
-        v[0] = v[1];
-        v[1] = x;
-        return (tmp + v[0] + v[1]) / 3;
+    int step(int x_n) {
+        int y_n = (x_n/20) + (x_n_1/20) + 9*y_n_1/10;
+        x_n_1 = x_n;
+        y_n_1 = y_n;
+        return(y_n);
     }
 };
 
@@ -111,45 +105,24 @@ private:
     volatile int right_moving_sum = 0;
     volatile int refractory_period = 45; // 40 samples at 250Hz = 160ms which gives 375BPM maximum heart rate
     volatile int rp_counter = 0;
-    volatile int peak_threshold = 0;
-    volatile int peak_threshold_sum = 0;
-
-    volatile int peak1 = 0;
-    volatile int peak2 = 0;
-    volatile int peak3 = 0;
-    volatile int peak4 = 0;
-    volatile int peak5 = 0;
-    volatile int peak6 = 0;
+    
+    volatile int peakSum = 0;
+    volatile int peakThreshold = 0;
 
 public:
     void updatePeakThreshold(const int newPeakVal) {
-        // peak threshold averaged over the last BUFFER_LEN peaks
-        // averaging over more peaks makes reduces sensitivity to amplitude spikes
-        // thresholds are set at ~1/3 of the average amplitude, because testing showed
-        // that they don't need to be very high
-        peak_threshold_sum -= peak1;
-        peak_threshold_sum += newPeakVal;
-
-        peak1 = peak2;
-        peak2 = peak3;
-        peak3 = peak4;
-        peak4 = peak5;
-        peak5 = peak6;
-        peak6 = newPeakVal;
-        // set the threshold to about 1/2
-        peak_threshold = peak_threshold_sum / 9;
+        peakSum += newPeakVal;
+        peakSum -= pb[BUFFER_LEN - PEAK_BUFFER_LEN];
+        pb.addSample(newPeakVal);
+        peakThreshold = peakSum / (2 * PEAK_BUFFER_LEN);
     }
 
     void resetPeakThreshold() {
-        // if threshold becomes too high, it must timeout and reset
-        peak_threshold_sum = 0;
-        peak_threshold = 0;
-        peak1 = 0;
-        peak2 = 0;
-        peak3 = 0;
-        peak4 = 0;
-        peak5 = 0;
-        peak6 = 0;
+        peakSum = 0;
+        peakThreshold = 0;
+        for(int ii=BUFFER_LEN - PEAK_BUFFER_LEN; ii<PEAK_BUFFER_LEN; ii++){
+            pb[ii] = 0;
+        }
     }
 
     void updateMovingAverages() {
@@ -175,7 +148,7 @@ public:
         }
 
         // enter rising state if refractory period over, slope is trending upwards, and above peak threshold
-        if (!rising && right_moving_sum > peak_threshold && left_moving_sum < right_moving_sum) {
+        if (!rising && right_moving_sum > peakThreshold && left_moving_sum < right_moving_sum) {
             rising = true;
         } else if (rp_counter > THRESHOLD_RESET_PERIOD) {
             rp_counter += 1;
