@@ -59,7 +59,7 @@ trigger_curve.setStyle(-1)
 trigger_curve.setSymbol(Qwt.QwtSymbol(Qwt.QwtSymbol.VLine,
                                       Qt.QBrush(),
                                       sympen,
-                                      Qt.QSize(7, 7)))
+                                      Qt.QSize(3, 3)))
 trigger_curve.setPen(Qt.QPen(Qt.Qt.red))
 
 # if its a windows 7 machine clean up the blinkyness by running anti aliasing
@@ -176,7 +176,7 @@ class plotData(object):
         # mark trigger pulse
         if trigger and self.trigger_count > self.trigger_pulse_width:
             # make the trigger marker appear just above the BP plot line
-            self.ts[self.last_point] = (sampleval / SIXTEEN_BIT_TO_COUNTS) + 0.1
+            self.ts[self.last_point] = (sampleval / SIXTEEN_BIT_TO_COUNTS) + 0.003
             self.trigger_count = 0
         else:
             self.ts[self.last_point] = -1 # -1 will place these points outside the plot's viewable area

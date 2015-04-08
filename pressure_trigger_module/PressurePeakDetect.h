@@ -1,14 +1,18 @@
 #ifndef __PRESSUREPEAKDETECTH__
 #define __PRESSUREPEAKDETECTH__
 
-const int BUFFER_LEN = 10; // determines how many samples will be stored at a time
-const int THRESHOLD_RESET_PERIOD = 1000; // reset magnitude thresholds after 2.4 seconds without heartbeat
+const int BUFFER_LEN = 15; // determines how many samples will be stored at a time
+const int PEAK_BUFFER_LEN = 5;
+const int THRESHOLD_RESET_PERIOD = 1250; // reset magnitude thresholds after 5 seconds without heartbeat
+const int ROLLING_POINT_SPACING = 2;
+const int REFRACTORY_PERIOD = 20; // 40 samples at 250Hz = 160ms which gives 375BPM maximum heart rate
+volatile int THRESHOLD_SCALE = 3 * PEAK_BUFFER_LEN / 2;
 
-class circularBuffer {
+class ringBuffer {
     // old items overwrite new items
     // item 0 is the oldest, item BUFFER_LEN -1 is the newest
 public:
-    circularBuffer() {
+    ringBuffer() {
         // initialize to all zeros, so that the moving averages on sames initialize to reasonable values
         for(int ii=0; ii < BUFFER_LEN; ii++) {
             addSample(0);
@@ -22,12 +26,7 @@ private:
 public:
     volatile int& operator[] (const int nIndex) {
         // python style indexing, negative indices count back from the end
-        if (nIndex > -1)  {
-            return buff[(first + nIndex)%BUFFER_LEN];
-        }
-        else {
-            return buff[(first + validItems + nIndex)%BUFFER_LEN];
-        }
+        return buff[(first + validItems + nIndex)%BUFFER_LEN];
     }
     void addSample(const int newSample) {
         // add samples until array full, then begin overwriting oldest
@@ -43,16 +42,13 @@ public:
     }
 };
 
-
 //Low pass chebyshev filter order=1 alpha1=0.2
-class filter
-{
+class lowPassFilter {
 private:
     int x_n_1 = 0;
     int y_n_1 = 0;
 public:
-    int step(int x_n)
-    {
+    int step(int x_n) {
         int y_n = (x_n/20) + (x_n_1/20) + 9*y_n_1/10;
         x_n_1 = x_n;
         y_n_1 = y_n;
@@ -60,14 +56,14 @@ public:
     }
 };
 
-class slopesum {
+class slopeSumFilter {
     // taken from MIT, this filter excentuates the first rising edge
     // of the signal, and removes the secondary knee
 public:
-    slopesum(void) {}
+    slopeSumFilter(void) {}
 private:
     volatile int slope_sum = 0;
-    circularBuffer sampleBuffer; // filtered samples
+    ringBuffer sampleBuffer; // filtered samples
 public:
     int step(const int x) {
         // the result of this recursive calculation is equivilant to adding all of the positive
@@ -91,63 +87,56 @@ public:
 };
 
 class peakDetect {
-// peak detection state machine
-// state 0: rising
-// state 1: refractory period
-
 public:
     peakDetect() {}
 private:
-    volatile boolean rising = true;
-    volatile int peak_threshold = 0;
-    volatile int peak_threshold_sum = 0;
-    
-    volatile int peak1 = 0;
-    volatile int peak2 = 0;
-    volatile int peak3 = 0;
-    volatile int peak4 = 0;
+    ringBuffer sb; // ssf samples
+    ringBuffer pb; // peak values
 
+    volatile bool rising = true;
+    volatile int rp_counter = 0;
+    
+    volatile int peakSum = 0;
+    volatile int peakThreshold = 0;
 public:
-    boolean isPeak(const int x_n) {      
-      bool peakDetected = false;
-      
-      if(rising) {
-          if (x_n_1 > x_n  && x_n_1 > peak_threshold) {
-              updatePeakThreshold(x_n_1);
-              rising = false;
-              trough_detected = false;
-              peakDetected = true;
-          }
-        } else if (trough_detected && x_n_1 > x_n) {
-            rising = true;
-        } else if (x_n < peak_threshold){
-            trough_detected = true;
-        }
-        
-        x_n_1 = x_n;
-        return(peakDetected);
-      }
-    
-    void updatePeakThreshold(const int newPeakVal) {
-        peak_threshold_sum -= peak1;
-        peak_threshold_sum += newPeakVal;
-        
-        peak1 = peak2;
-        peak2 = peak3;
-        peak3 = peak4;
-        peak4 = newPeakVal;
+     bool isPeak(const int x) {
+        sb.addSample(x);
+        int lrs = sb[BUFFER_LEN - ROLLING_POINT_SPACING] + sb[BUFFER_LEN - ROLLING_POINT_SPACING -1];
+        int rrs = sb[BUFFER_LEN - 1] + x;
 
-        peak_threshold = peak_threshold_sum / 8;
+        if (rising && lrs > rrs) {
+            updatePeakThreshold(lrs);
+            rising = false;
+            if(rp_counter > REFRACTORY_PERIOD){
+              rp_counter = 0;
+              return(true);
+            }
+        }
+        // enter rising state if refractory period over, slope is trending upwards, and above peak threshold
+        if (!rising && lrs > peakThreshold && lrs < rrs) {
+            rising = true;
+        } else if (rp_counter > THRESHOLD_RESET_PERIOD) {
+            rp_counter += 1;
+            resetPeakThreshold();            
+        } else {
+            rp_counter += 1;
+        }
+        return(false);
+    }
+
+    void updatePeakThreshold(const int newPeakVal) {
+        peakSum += newPeakVal;
+        peakSum -= pb[BUFFER_LEN - PEAK_BUFFER_LEN];
+        pb.addSample(newPeakVal);
+        peakThreshold = peakSum / THRESHOLD_SCALE;
     }
 
     void resetPeakThreshold() {
-        // if threshold becomes too high, it must timeout and reset
-        peak_threshold_sum = 0;
-        peak_threshold = 0;
-        peak1 = 0;
-        peak2 = 0;
-        peak3 = 0;
-        peak4 = 0;
+        peakSum = 0;
+        peakThreshold = 0;
+        for(int ii=BUFFER_LEN - PEAK_BUFFER_LEN; ii<PEAK_BUFFER_LEN; ii++){
+            pb[ii] = 0;
+        }
     }
 };
 
