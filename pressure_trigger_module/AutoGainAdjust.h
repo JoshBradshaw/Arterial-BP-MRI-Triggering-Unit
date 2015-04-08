@@ -154,5 +154,4 @@ void adjustGain(const int sensor_value) {
     windowCount++;
 }
 
-
 #endif

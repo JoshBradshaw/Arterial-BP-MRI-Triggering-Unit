@@ -85,7 +85,7 @@ void sample() {
     if (sampleSendCount < SAMPLE_SEND_PERIOD) {
         sampleSendCount += 1;
     } else {
-        Serial.printf("%d %d\n", ssfVal, triggerPulseHigh);
+        Serial.printf("%d %d %d\n", ssfVal, sampleVal, triggerPulseHigh);
         sampleSendCount = 0;
     }
 }

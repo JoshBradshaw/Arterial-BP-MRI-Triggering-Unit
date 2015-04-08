@@ -3,9 +3,10 @@
 
 const int BUFFER_LEN = 15; // determines how many samples will be stored at a time
 const int PEAK_BUFFER_LEN = 5;
-const int THRESHOLD_RESET_PERIOD = 1000; // reset magnitude thresholds after 2.4 seconds without heartbeat
+const int THRESHOLD_RESET_PERIOD = 1250; // reset magnitude thresholds after 5 seconds without heartbeat
 const int ROLLING_POINT_SPACING = 2;
-const int REFRACTORY_PERIOD = 45; // 40 samples at 250Hz = 160ms which gives 375BPM maximum heart rate
+const int REFRACTORY_PERIOD = 20; // 40 samples at 250Hz = 160ms which gives 375BPM maximum heart rate
+volatile int THRESHOLD_SCALE = 3 * PEAK_BUFFER_LEN / 2;
 
 class ringBuffer {
     // old items overwrite new items
@@ -127,7 +128,7 @@ public:
         peakSum += newPeakVal;
         peakSum -= pb[BUFFER_LEN - PEAK_BUFFER_LEN];
         pb.addSample(newPeakVal);
-        peakThreshold = peakSum / (3 * PEAK_BUFFER_LEN / 2);
+        peakThreshold = peakSum / THRESHOLD_SCALE;
     }
 
     void resetPeakThreshold() {
