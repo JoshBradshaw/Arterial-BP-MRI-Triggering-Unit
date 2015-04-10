@@ -14,7 +14,7 @@ from datetime import datetime
 from pprint import pprint
 
 TRIGGER_PULSE_CODE = 100000
-SIXTEEN_BIT_TO_COUNTS = 13107.2 # 2^16 counts / 5 V = 13107.2 counts / volt
+SIXTEEN_BIT_TO_COUNTS = 19859 # 2^16 counts / 5 V = 13107.2 counts / volt
 SERIAL_BAUDRATE = 115200
 
 log_dir = "logs"

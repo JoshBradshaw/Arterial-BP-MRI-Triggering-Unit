@@ -2,15 +2,17 @@
 #define __PRESSUREPEAKDETECTH__
 
 const int BUFFER_LEN = 15; // determines how many samples will be stored at a time
-const int PEAK_BUFFER_LEN = 5;
+const int PEAK_BUFFER_LEN = 5; // must be <= than BUFFER_LEN, determines how many peaks threshold average uses
 const int THRESHOLD_RESET_PERIOD = 1250; // reset magnitude thresholds after 5 seconds without heartbeat
-const int ROLLING_POINT_SPACING = 2;
-const int REFRACTORY_PERIOD = 20; // 40 samples at 250Hz = 160ms which gives 375BPM maximum heart rate
+const int ROLLING_POINT_SPACING = 2; // must be < than BUFFER_LEN
+
+// # of samples to wait before searching for peaks again, determines maximum possible BPM
+// should be kept as short as possible, because many problems arise when refractory period approaches beat period
+const int REFRACTORY_PERIOD = 20;
 volatile int THRESHOLD_SCALE = 3 * PEAK_BUFFER_LEN / 2;
 
 class ringBuffer {
-    // old items overwrite new items
-    // item 0 is the oldest, item BUFFER_LEN -1 is the newest
+// when buffer is full, oldest item is overwritten by the new item
 public:
     ringBuffer() {
         // initialize to all zeros, so that the moving averages on sames initialize to reasonable values
@@ -42,8 +44,11 @@ public:
     }
 };
 
-//Low pass chebyshev filter order=1 alpha1=0.2
+
 class lowPassFilter {
+// single pole, non-causal, recursive first order low pass filter
+// 3db cutoff frequency: 25Hz (chosen through trial and error)
+// http://www.mathworks.com/help/dsp/examples/designing-low-pass-fir-filters.html
 private:
     int x_n_1 = 0;
     int y_n_1 = 0;
@@ -57,8 +62,9 @@ public:
 };
 
 class slopeSumFilter {
-    // taken from MIT, this filter excentuates the first rising edge
-    // of the signal, and removes the secondary knee
+// implements the slope-sum function as defined in "An Open-source Algorithm to Detect Onset of Arterial Blood Pressure Pulses" by W. Zong et al
+// The buffer length is equivalent to the value k in the mathematical definition of the slope sum function. 
+// shorter butter lengths work better for slower heart rates. Always stay within the range of 10-25, 15 works best for fetal
 public:
     slopeSumFilter(void) {}
 private:
@@ -66,9 +72,8 @@ private:
     ringBuffer sampleBuffer; // filtered samples
 public:
     int step(const int x) {
-        // the result of this recursive calculation is equivilant to adding all of the positive
-        // slopes. we just subtract the contribution of the one we're taking away, and add
-        // the contribution of the one we're adding
+        // implemented with a ring buffer for efficiency
+        // calculation is equivalence to adding all of the positive slopes over the interval
         int old_slope = sampleBuffer[1] - sampleBuffer[0];
 
         if (old_slope > 0) {
@@ -90,34 +95,39 @@ class peakDetect {
 public:
     peakDetect() {}
 private:
-    ringBuffer sb; // ssf samples
-    ringBuffer pb; // peak values
+    ringBuffer sb; // ssf sample buffer
+    ringBuffer pb; // peak buffer
 
-    volatile bool rising = true;
+    volatile bool rising_edge = true;
     volatile int rp_counter = 0;
-    
-    volatile int peakSum = 0;
-    volatile int peakThreshold = 0;
+
+    volatile int peakSum = 0; // sum of all of the peaks in the peak buffer
+    volatile int peakThreshold = 0; // threshold value 
 public:
-     bool isPeak(const int x) {
+    bool isPeak(const int x) {
+        // peak detection state machine
+        // progression is: --> peak detected --> refractory period --> rising_edge detected --> repeat
+
         sb.addSample(x);
+        // reduce the effect of noise and jitter by adding two adjacent samples, spaced ROLLING_POINT_SPACING apart
+        // lrs = left rolling sum rrs = right rolling sum
+        // increasing ROLLING_POINT_SPACING lowers peak detection sensitivity, increases delay
         int lrs = sb[BUFFER_LEN - ROLLING_POINT_SPACING] + sb[BUFFER_LEN - ROLLING_POINT_SPACING -1];
         int rrs = sb[BUFFER_LEN - 1] + x;
 
-        if (rising && lrs > rrs) {
+        if (rising_edge && lrs > rrs && lrs > peakThreshold) {
             updatePeakThreshold(lrs);
-            rising = false;
-            if(rp_counter > REFRACTORY_PERIOD){
-              rp_counter = 0;
-              return(true);
-            }
+            rising_edge = false;
+            rp_counter = 0;
+            return(true);
         }
-        // enter rising state if refractory period over, slope is trending upwards, and above peak threshold
-        if (!rising && lrs > peakThreshold && lrs < rrs) {
-            rising = true;
+        // enter rising_edge state if refractory period over, slope is trending upwards
+        if (!rising_edge && rp_counter > REFRACTORY_PERIOD && lrs < rrs) {
+            rising_edge = true;
+        // reset the magnitude threshold if peaks are not being detected
         } else if (rp_counter > THRESHOLD_RESET_PERIOD) {
             rp_counter += 1;
-            resetPeakThreshold();            
+            resetPeakThreshold();
         } else {
             rp_counter += 1;
         }
@@ -134,7 +144,7 @@ public:
     void resetPeakThreshold() {
         peakSum = 0;
         peakThreshold = 0;
-        for(int ii=BUFFER_LEN - PEAK_BUFFER_LEN; ii<PEAK_BUFFER_LEN; ii++){
+        for(int ii=BUFFER_LEN - PEAK_BUFFER_LEN; ii<BUFFER_LEN; ii++) {
             pb[ii] = 0;
         }
     }

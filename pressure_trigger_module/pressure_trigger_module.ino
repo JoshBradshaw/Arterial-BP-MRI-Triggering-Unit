@@ -7,7 +7,7 @@ IntervalTimer sampletimer;
 // written for Teensy 3.1 running at 96 MHz
 
 const int SAMPLING_PERIOD = 4; // milliseconds
-const int TRIGGER_PULSE_DURATION = 20; // milliseconds
+const int TRIGGER_PULSE_DURATION = 20; // milliseconds, given in the scanner's external triggering timing table
 const int SCANNER_TRIGGER_PIN = 19;
 const int LED_PIN = 18;
 
@@ -55,11 +55,12 @@ void sample() {
     // signal pathway
     // blood pressure transducer --> Arduino ADC --> low pass filter --> slopesum function --> peak detector
     int sampleVal = analogRead(ANALOG_INPUT_PIN);
-    int filteredVal = filt.step(sampleVal);
-    int ssfVal = ssf.step(filteredVal);
+    int lpfVal = filt.step(sampleVal);
+    int ssfVal = ssf.step(lpfVal);
     bool sampleIsPeak = pd.isPeak(ssfVal);
 
     if(sampleIsPeak) {
+        // when a peak is detected, sent a TTL pulse to the scanner
         digitalWrite(SCANNER_TRIGGER_PIN, HIGH);
         digitalWrite(LED_PIN, HIGH);
         triggerPulseHigh = true;
@@ -67,6 +68,7 @@ void sample() {
     }
 
     if (triggerPulseHigh && pulseDurationCount >= PULSE_DURATION) {
+        // keep the TTL pulse at logic high (3.3V) until pulse duration exceeded 
         digitalWrite(SCANNER_TRIGGER_PIN, LOW);
         digitalWrite(LED_PIN, LOW);
         triggerPulseHigh = false;
@@ -85,7 +87,7 @@ void sample() {
     if (sampleSendCount < SAMPLE_SEND_PERIOD) {
         sampleSendCount += 1;
     } else {
-        Serial.printf("%d %d %d\n", ssfVal, sampleVal, triggerPulseHigh);
+        Serial.printf("%d %d\n", sampleVal, triggerPulseHigh);
         sampleSendCount = 0;
     }
 }
