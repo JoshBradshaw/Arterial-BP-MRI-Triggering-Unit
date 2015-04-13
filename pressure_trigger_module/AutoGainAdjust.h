@@ -29,14 +29,15 @@
 // set pin 10 as the slave select for the digital pot:
 const int slaveSelectPin = 10;
 const int INPUT_SELECT_PIN = 17;
-int GAIN_POT;
+
+volatile int GAIN_POT;
 
 // these numbers are based on a 16 bit ADC which has 2^16 = 65536 counts
-int MIN_SIGNAL_AMPLITUDE; // ~0.76 V from the noninverting amplifier
-int TARGET_AMPLITUDE; // ~2.67 V from the noninverting amplifier
+const int MIN_SIGNAL_AMPLITUDE = 25000; // ~0.76 V from the noninverting amplifier
+const int TARGET_AMPLITUDE = 35000;
 const int MAX_SIGNAL_AMPLITUDE = 55000; // ~4.20 V from the noninverting amplifier
 // number of potentiomter codes to correct by if signal is out of range
-// a higher number results in a faster correction
+// a higher number results in a faster correction, at the risk of over-adjusting to short term amplitude spikes
 const int CORRECTION = 5;
 
 volatile int potentiometerValue = 0; // range 0-256 where 0 -> ~84 ohms and 256 -> ~50 k-ohms
@@ -69,15 +70,10 @@ void digitalPotWrite(const int address, int value) {
 
 void setupGainAdjustment() {
     bool analogInputSelect = digitalRead(INPUT_SELECT_PIN);
-
     if (analogInputSelect) {
         GAIN_POT = 2; // transonic signal pathway is connected to B3 and W3 which is pot 2 (zero indexing)
-        MIN_SIGNAL_AMPLITUDE = 40000;
-        TARGET_AMPLITUDE = 47000;
     } else {
         GAIN_POT = 3; // samba signal pathway
-        TARGET_AMPLITUDE = 35000;
-        MIN_SIGNAL_AMPLITUDE = 40000;
     }
 
     pinMode (slaveSelectPin, OUTPUT);

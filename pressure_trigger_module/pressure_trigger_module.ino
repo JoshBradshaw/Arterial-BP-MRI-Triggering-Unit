@@ -13,7 +13,7 @@ const int LED_PIN = 18;
 
 const int PULSE_DURATION = TRIGGER_PULSE_DURATION / SAMPLING_PERIOD;
 const int GAIN_ADJUST_PERIOD = 100; // milliseconds
-const int gainAdjustDuration = GAIN_ADJUST_PERIOD / SAMPLING_PERIOD;
+volatile int gainAdjustDuration = GAIN_ADJUST_PERIOD / SAMPLING_PERIOD;
 volatile int pulseDurationCount;
 volatile int gainAdjustCount = 0;
 volatile bool triggerPulseHigh = false;

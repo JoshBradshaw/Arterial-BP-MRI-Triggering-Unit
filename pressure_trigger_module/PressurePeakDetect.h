@@ -8,7 +8,7 @@ const int ROLLING_POINT_SPACING = 2; // must be < than BUFFER_LEN
 
 // # of samples to wait before searching for peaks again, determines maximum possible BPM
 // should be kept as short as possible, because many problems arise when refractory period approaches beat period
-const int REFRACTORY_PERIOD = 20;
+const int REFRACTORY_PERIOD = 40;
 volatile int THRESHOLD_SCALE = 3 * PEAK_BUFFER_LEN / 2;
 
 class ringBuffer {
