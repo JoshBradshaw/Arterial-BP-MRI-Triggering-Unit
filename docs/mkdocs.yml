@@ -9,12 +9,12 @@ pages:
 - ['instructions/user_manual.md', 'Instructions', 'User Manual']
 - ['instructions/guidelines-for-adapting-to-new-instrument.md', 'Instructions', 'Guidelines for using a Different Pressure Measurement System']
 - ['instructions/reflash-the-microcontroller.md', 'Instructions', 'Reflashing the Microcontroller']
-- ['build_log/apb-triggering.md', 'Build Log', 'Triggering Algorithm']
-- ['build_log/set-adaptive-gain-algorithm.md', 'Build Log', 'Gain Adjustment Algorithm']
-- ['build_log/adaptive-gain-adjustment.md', 'Build Log', 'Variable Gain Amplifier']
-- ['build_log/gui-design.md', 'Build Log', 'Monitoring Tool']
-- ['build_log/pcb-design.md', 'Build Log', 'PCB']
-- ['build_log/testing-australian-data.md', 'Build Log', 'Validation']
+- ['system_design/apb-triggering.md', 'System Design', 'System Block Diagram']
+- ['system_design/apb-triggering.md', 'System Design', 'Triggering Algorithm']
+- ['system_design/adaptive-gain-adjustment.md', 'System Design', 'Variable Gain Amplifier']
+- ['system_design/gui-design.md', 'System Design', 'Monitoring Tool']
+- ['system_design/pcb-design.md', 'System Design', 'PCB']
+- ['system_design/testing-australian-data.md', 'System Design', 'Validation']
 
 theme: readthedocs
 copyright: Copyright &copy; 2015, <a href="http://joshbradshaw.github.io/">Josh Bradshaw</a>.
