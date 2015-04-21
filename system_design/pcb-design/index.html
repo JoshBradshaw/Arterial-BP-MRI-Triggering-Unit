@@ -63,15 +63,15 @@
 
     
         
-        <span>Build Log</span>
+        <span>System Design</span>
             
                 <li class="toctree-l1 ">
-                    <a class="" href="../apb-triggering">Triggering Algorithm</a>
+                    <a class="" href="../apb-triggering">System Block Diagram</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
-                    <a class="" href="../set-adaptive-gain-algorithm">Gain Adjustment Algorithm</a>
+                    <a class="" href="../apb-triggering">Triggering Algorithm</a>
                     
                 </li>
             
@@ -156,7 +156,7 @@
 <p>I opted to design a simple PCB for this project, so that more versions of this triggering unit can be produced with minimal effort. </p>
 <h3 id="design-criteria">Design Criteria</h3>
 <ol>
-<li>Analog ground plane must be completely separated from the digital groundplane to avoid crosstalk on the sensitive op-amp circuits.</li>
+<li>Analog ground plane must be completely separated from the digital groundplane to avoid crosstalk on the sensitive analog amplification circuits.</li>
 <li>Must use 10/10 thou minimum trace width and clearance, so that this board can easily be manufactured by anyone.</li>
 <li>Must meet the weird drill size restrictions of <a href="http://apcircuits.com/">APcircuits</a>, because they've the only vendor I've who will ship a few boards to SickKids on a quick turnaround for a reasonable price.</li>
 <li>Must use parts with &gt;1mm pin pitch, so that it can easily be hand assembled by novices.</li>

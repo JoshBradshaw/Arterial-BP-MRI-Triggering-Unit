@@ -63,35 +63,35 @@
 
     
         
-        <span>Build Log</span>
+        <span>System Design</span>
             
                 <li class="toctree-l1 ">
-                    <a class="" href="build_log/apb-triggering/">Triggering Algorithm</a>
+                    <a class="" href="system_design/apb-triggering/">System Block Diagram</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
-                    <a class="" href="build_log/set-adaptive-gain-algorithm/">Gain Adjustment Algorithm</a>
+                    <a class="" href="system_design/apb-triggering/">Triggering Algorithm</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
-                    <a class="" href="build_log/adaptive-gain-adjustment/">Variable Gain Amplifier</a>
+                    <a class="" href="system_design/adaptive-gain-adjustment/">Variable Gain Amplifier</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
-                    <a class="" href="build_log/gui-design/">Monitoring Tool</a>
+                    <a class="" href="system_design/gui-design/">Monitoring Tool</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
-                    <a class="" href="build_log/pcb-design/">PCB</a>
+                    <a class="" href="system_design/pcb-design/">PCB</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
-                    <a class="" href="build_log/testing-australian-data/">Validation</a>
+                    <a class="" href="system_design/testing-australian-data/">Validation</a>
                     
                 </li>
             
@@ -173,9 +173,7 @@ td {
 Finally, a USB cable runs out of the back corner of the unit. This cable is connected to a computer to power the unit, and optionally to transfer the blood pressure readings to the monitoring software.</p>
 <h2 id="monitoring-software">Monitoring Software</h2>
 <p><img alt="alt text" src=".//images/monitoring_system.png" title="triggering unit photo" /></p>
-<p>The monitoring tool give the experimenter real-time feedback on the pressure catheter and the triggering signal. The top chart animation shows the input signal from the pressure catheter, and the bottom chart animation shows the triggering signal that's been sent to the scanner. These charts are updated in real-time with &lt;20ms of delay, so you'll be aware of any irregular heartbeats, or problems with the pressure catheter, right as they happen. Every run of the triggering unit is logged with time and date stamps, so it can be compared with the MRI data in post processing if required.</p>
-<p>For more information about the monitoring software see:
-1. Monitoring software design</p>
+<p>The monitoring tool give the experimenter real-time feedback on the pressure catheter and the triggering signal. The rolling chart shows the blood pressure signal, and the red indicators indicate when the triggering signal was sent to the scanner.</p>
 <h3 id="scanner-compatibility">Scanner compatibility</h3>
 <p>The SickKids research MRI scanner is the Siemens Magnetom Trio with a field strength of 3T, so the triggering unit's TTL output is calibrated to meet or exceed all of the parameters given in Siemen's timing diagram (taken from the latest version of the Magnetom Trio operating manual). The TTL pulses sent by the unit are 20ms in duration at 3.3V, which should be sufficient for most MRI scanners.</p>
 <h3 id="how-to-aquire-a-unit">How to aquire a unit</h3>
